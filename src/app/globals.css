@@ -1,26 +1,222 @@
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* Premium Dark Luxury Color Palette */
+  --color-bg-dark: #050505;
+  --color-bg-card: #0d0d0d;
+  --color-bg-elevated: #161616;
+  
+  --color-gold-light: #e5d5c0;
+  --color-gold: #c5a880;
+  --color-gold-dark: #a3845b;
+  
+  --color-brand-purple: #8b5cf6;
+  --color-brand-purple-dark: #6d28d9;
+  --color-brand-pink: #ec4899;
+  --color-brand-pink-dark: #be185d;
+  
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #666666;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Premium fonts */
+  --font-sans: var(--font-inter), sans-serif;
+  --font-display: "Satoshi", var(--font-inter), sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Custom Transitions & Animation Easing */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes warp-star {
+    0% {
+      transform: translateZ(-700px);
+      opacity: 0;
+    }
+    8% {
+      opacity: 0.65;
+    }
+    80% {
+      opacity: 0.45;
+    }
+    95% {
+      opacity: 0;
+    }
+    100% {
+      transform: translateZ(250px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes rotateBorder {
+    from {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
   }
 }
 
+/* Client Cards Rotating Border Tracer */
+.card-border-tracer {
+  transform: translate(-50%, -50%);
+  animation: rotateBorder 4.5s linear infinite;
+  animation-play-state: paused;
+  will-change: transform;
+}
+
+.group:hover .card-border-tracer {
+  animation-play-state: running;
+}
+
+/* Base Styles & Modern Dark Theme */
+:root {
+  color-scheme: dark;
+}
+
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+  margin: 0;
+  padding: 0;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent FOUC — keep background solid while JS hydrates */
+  background: #050505;
+}
+
+/* Promote page-level motion wrapper to GPU compositor immediately */
+[data-framer-component-type],
+.framer-motion-page {
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 4px;
+  border: 2px solid var(--color-bg-dark);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-dark);
+}
+
+/* Premium selection styles */
+::selection {
+  background-color: var(--color-gold);
+  color: var(--color-bg-dark);
+}
+
+/* Global Typography System */
+* {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3 {
+  font-family: var(--font-display);
+}
+
+h1, .h1 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 700; /* Bold cinematic */
+  line-height: 1.05; /* Adjusted for bold readability */
+  letter-spacing: -0.03em;
+}
+
+h2, .h2 {
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  font-weight: 600; /* Semibold section title */
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+h3, .h3 {
+  font-size: clamp(1.35rem, 3vw, 2.05rem);
+  font-weight: 600; /* Semibold sub-title */
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+p, .body-text {
+  font-size: 1rem;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  color: var(--color-text-secondary);
+  opacity: 0.9; /* Readable, softer opacity */
+}
+
+/* Lenis Smooth Scroll Configuration */
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Creative Premium Glassmorphism & Micro-effects */
+.glassmorphism {
+  background: rgba(13, 13, 13, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glassmorphism-light {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, var(--color-gold-light) 0%, var(--color-gold) 50%, var(--color-gold-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-border-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gold-border-hover:hover {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 20px rgba(197, 168, 128, 0.15);
 }
