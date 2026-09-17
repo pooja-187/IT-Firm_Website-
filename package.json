@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:backend": "node manzio-backend/server.js",
+    "dev:admin": "npm --prefix manzio-admin run dev",
+    "build:admin": "npm --prefix manzio-admin run build",
     "build": "next build",
+    "build:all": "npm run build:admin && next build",
     "start": "next start",
     "lint": "eslint"
   },

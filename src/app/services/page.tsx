@@ -5,66 +5,48 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ZoomParallax } from "@/components/ui/zoom-parallax";
-import Lenis from "lenis";
 import { cn } from "@/utils/cn";
 import { Component as ParallaxScrollFeatureSection } from "@/components/ui/parallax-scroll-feature-section";
 import AnimatedTextCycle from "@/components/ui/animated-text-cycle";
 
 const PARALLAX_IMAGES = [
   {
-    src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1280&h=720&fit=crop&crop=entropy&auto=format&q=80",
-    alt: "Modern architecture",
+    src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1280&h=800&fit=crop&crop=entropy&auto=format&q=80",
+    alt: "Software engineering and development team collaborating",
   },
   {
-    src: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1280&h=720&fit=crop&crop=entropy&auto=format&q=80",
-    alt: "Software engineering",
+    src: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1280&h=720&fit=crop&crop=entropy&auto=format&q=80",
+    alt: "Code editor and web development syntax",
   },
   {
-    src: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&h=800&fit=crop&crop=entropy&auto=format&q=80",
-    alt: "Data analytics",
+    src: "https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&h=1600&fit=crop&crop=entropy&auto=format&q=80",
+    alt: "Brand identity, typography and design system guidelines",
   },
   {
-    src: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1280&h=720&fit=crop&crop=entropy&auto=format&q=80",
-    alt: "Mobile design",
+    src: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=900&h=900&fit=crop&crop=entropy&auto=format&q=80",
+    alt: "Full stack engineering and JavaScript application",
   },
   {
-    src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=800&fit=crop&crop=entropy&auto=format&q=80",
-    alt: "Brand design",
+    src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=1000&fit=crop&crop=entropy&auto=format&q=80",
+    alt: "Digital marketing growth and analytics performance dashboard",
   },
   {
-    src: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1280&h=720&fit=crop&crop=entropy&auto=format&q=80",
-    alt: "Web development",
+    src: "https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=1280&h=800&fit=crop&crop=entropy&auto=format&q=80",
+    alt: "Frontend UI architecture and Vue React code",
   },
   {
-    src: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1280&h=720&fit=crop&crop=entropy&auto=format&q=80",
-    alt: "AI Solutions",
+    src: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=600&h=600&fit=crop&crop=entropy&auto=format&q=80",
+    alt: "Python algorithms and machine learning code",
   },
 ];
 
 export default function ServicesPage() {
-  // Smooth scroll using lenis
-  useEffect(() => {
-    const lenis = new Lenis();
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
-  }, []);
-
   return (
-    <div className="w-full bg-[#050505] text-white overflow-x-hidden">
+    <div className="w-full bg-[#050505] text-white overflow-x-clip">
 
       {/* ── HERO: ZoomParallax Showcase ── */}
       <section className="relative w-full">
-        {/* Sticky/Overlaid heading on top of the parallax */}
-        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 flex flex-col items-center justify-center h-screen text-center px-6">
+        <ZoomParallax images={PARALLAX_IMAGES}>
           {/* Radial spotlight */}
           <div
             aria-hidden="true"
@@ -77,8 +59,7 @@ export default function ServicesPage() {
           <h1 className="text-center text-4xl font-bold">
             Services crafted for Ambitious brands
           </h1>
-        </div>
-        <ZoomParallax images={PARALLAX_IMAGES} />
+        </ZoomParallax>
       </section>
 
       {/* ── TRANSITION TEXT CYCLE ── */}

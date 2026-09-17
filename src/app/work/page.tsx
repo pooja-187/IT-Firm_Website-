@@ -299,9 +299,51 @@ function splitTitleIntoTwoLines(title: string): React.ReactNode {
 
 export default function WorkPage() {
   const pageContainerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
+
+  // Smooth, snappy playback optimization to prevent lag, slow-motion feel, or getting stuck
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = true;
+    video.defaultPlaybackRate = 1.0;
+    video.playbackRate = 1.0;
+
+    const playVideo = () => {
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+    };
+
+    playVideo();
+
+    const handleVisibility = () => {
+      if (!document.hidden) playVideo();
+    };
+
+    const handleEnded = () => {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    };
+
+    const handleWaiting = () => {
+      video.play().catch(() => {});
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    video.addEventListener("ended", handleEnded);
+    video.addEventListener("waiting", handleWaiting);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      video.removeEventListener("ended", handleEnded);
+      video.removeEventListener("waiting", handleWaiting);
+    };
+  }, []);
 
   // Mouse spotlight coordination variables
   const mouseX = useMotionValue(0);
@@ -583,13 +625,23 @@ export default function WorkPage() {
             }
           >
             <video
-              src="/work-video.mp4"
+              ref={videoRef}
+              key="/videos/work_video_dynamic.mp4?v=3"
+              src="/videos/work_video_dynamic.mp4?v=3"
               className="w-full h-full object-cover rounded-2xl"
               autoPlay
               loop
               muted
               playsInline
-            />
+              preload="auto"
+              style={{
+                transform: "translateZ(0)",
+                willChange: "transform",
+                backfaceVisibility: "hidden"
+              }}
+            >
+              <source src="/videos/work_video_dynamic.mp4?v=3" type="video/mp4" />
+            </video>
           </ContainerScroll>
 
           {/* Category Filter Pills */}

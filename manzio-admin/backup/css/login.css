@@ -1,0 +1,327 @@
+/* ============================================================
+   MANZIO ADMIN — Login Page (Light Theme)
+   ============================================================ */
+
+/* ── Animated Gradient Background ──────────────────────────── */
+.login-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(
+    -45deg,
+    #eef2ff,
+    #f0e7fe,
+    #e0f2fe,
+    #ede9fe,
+    #ecfdf5,
+    #eef2ff
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 18s ease infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle decorative orbs */
+.login-page::before,
+.login-page::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.login-page::before {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.25), transparent 70%);
+  top: -10%;
+  right: -5%;
+}
+
+.login-page::after {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent 70%);
+  bottom: -8%;
+  left: -3%;
+}
+
+/* ── Login Card ────────────────────────────────────────────── */
+.login-card {
+  background: var(--bg-white);
+  width: 100%;
+  max-width: 420px;
+  padding: 48px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  position: relative;
+  z-index: 1;
+  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── Logo ──────────────────────────────────────────────────── */
+.login-logo {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  letter-spacing: -0.5px;
+}
+
+.login-logo span {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-logo .logo-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 12px;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* ── Background Shapes ─────────────────────────────────────── */
+.login-bg-shapes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.login-bg-shapes .shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+}
+
+.login-bg-shapes .shape-1 {
+  width: 500px;
+  height: 500px;
+  background: rgba(99, 102, 241, 0.25);
+  top: -15%;
+  right: -10%;
+}
+
+.login-bg-shapes .shape-2 {
+  width: 400px;
+  height: 400px;
+  background: rgba(139, 92, 246, 0.2);
+  bottom: -10%;
+  left: -5%;
+}
+
+.login-bg-shapes .shape-3 {
+  width: 300px;
+  height: 300px;
+  background: rgba(6, 182, 212, 0.15);
+  top: 40%;
+  left: 30%;
+}
+
+/* ── Subtitle ──────────────────────────────────────────────── */
+.login-subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+/* ── Form Group ────────────────────────────────────────────── */
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: var(--bg-white);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.form-group input:focus {
+  border-color: var(--accent-indigo);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* ── Password toggle (optional icon area) ──────────────────── */
+.form-group .input-icon {
+  position: absolute;
+  right: 14px;
+  bottom: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.form-group .input-icon:hover {
+  color: var(--text-secondary);
+}
+
+/* ── Remember / Forgot Row ─────────────────────────────────── */
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  font-size: 0.85rem;
+}
+
+.login-options label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.login-options a {
+  color: var(--accent-indigo);
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+.login-options a:hover {
+  color: var(--accent-violet);
+}
+
+/* ── Login Button ──────────────────────────────────────────── */
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--gradient-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+}
+
+.login-btn:hover::after {
+  opacity: 1;
+}
+
+.login-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+}
+
+/* ── Error Message ─────────────────────────────────────────── */
+.login-error {
+  color: var(--accent-rose);
+  font-size: 0.85rem;
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(244, 63, 94, 0.08);
+  border-radius: var(--radius-sm);
+  display: none;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.login-error.show {
+  display: block;
+  animation: fadeInUp 0.3s ease both;
+}
+
+/* ── Keyframes ─────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 50% 100%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 0%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 24px;
+    max-width: 100%;
+    border-radius: var(--radius-lg);
+  }
+
+  .login-logo {
+    font-size: 1.6rem;
+  }
+}
