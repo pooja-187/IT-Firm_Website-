@@ -1,0 +1,33 @@
+# Guarantee LiteSpeed serves index.html by default
+DirectoryIndex index.html index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Allow existing real files and directories to be served directly
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # 2. Automatically serve assets from public/ (videos, images, icons, etc.)
+  RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
+  RewriteRule ^(.*)$ public/$1 [L]
+
+  # 3. Media routing to backend media folder
+  RewriteRule ^media/(.*)$ manzio-backend/media/$1 [L]
+
+  # 4. Admin SPA routing: /admin and /admin/* -> public/admin/index.html
+  RewriteRule ^admin(/.*)?$ public/admin/index.html [L]
+
+  # 5. Clean URLs: map /about -> about.html, /work -> work.html, etc.
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^([^/]+)/?$ $1.html [L]
+
+  # 6. Clean URLs for subfolders (e.g. /blog/slug -> blog/slug.html)
+  RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
+  RewriteRule ^(.*)/?$ $1/index.html [L]
+</IfModule>
+
+# Custom 404 Error Page
+ErrorDocument 404 /404.html
