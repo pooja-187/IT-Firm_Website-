@@ -25,6 +25,16 @@ const nextConfig: NextConfig = {
         hostname: "www.travinno.com",
         pathname: "/media/**",
       },
+      {
+        protocol: "https",
+        hostname: "manziostudio.com",
+        pathname: "/media/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.manziostudio.com",
+        pathname: "/media/**",
+      },
     ],
   },
   async rewrites() {
