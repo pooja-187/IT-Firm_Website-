@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "install:all": "npm install && npm --prefix manzio-backend install && npm --prefix manzio-admin install",
     "dev": "next dev",
     "dev:backend": "node manzio-backend/server.js",
     "dev:admin": "npm --prefix manzio-admin run dev",

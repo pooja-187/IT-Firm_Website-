@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Manzio Creative Studio — IT Firm Portfolio & System
 
-## Getting Started
+A modern, high-performance portfolio website, custom admin panel, and Node.js backend engineered for Manzio Creative Studio.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🏛️ Architecture Overview
+
+The repository is structured as a unified monorepo containing all 3 tiers:
+
+```
+├── src/                  # Client Website (Next.js 15 App Router + React 19 + Framer Motion)
+├── manzio-admin/         # Custom Admin Panel Source (Vite + React SPA)
+├── manzio-backend/       # Backend API (Node.js Express + SQLite3 + Media Storage)
+├── public/
+│   ├── admin/            # Pre-compiled Admin Panel (served directly at /admin)
+│   └── videos/           # 60 FPS optimized video assets
+├── next.config.ts        # Dynamic rewrites (/api/* and /media/* proxying)
+└── package.json          # Root scripts managing all tiers
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Quick Start (Local Development)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Install Dependencies
+Install dependencies for all 3 tiers in one command:
+```bash
+npm run install:all
+```
 
-## Learn More
+### 2. Start the Stack
+In separate terminal windows (or via background runner):
 
-To learn more about Next.js, take a look at the following resources:
+- **Start Node.js Backend** (Port 8000):
+  ```bash
+  npm run dev:backend
+  ```
+- **Start Website & Admin** (Port 3000):
+  ```bash
+  npm run dev
+  ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Access the apps locally:
+- **Client Website**: [http://localhost:3000](http://localhost:3000)
+- **Admin Panel**: [http://localhost:3000/admin](http://localhost:3000/admin)
+- **Backend API**: [http://127.0.0.1:8000/api/](http://127.0.0.1:8000/api/)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🌐 Production Deployment Guide (`travinno.com`)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 1. Build
+```bash
+npm run build:all
+```
+*(Compiles the admin panel into `public/admin/` and creates the optimized Next.js production build).*
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 2. Run with PM2
+```bash
+# Start backend API (Port 8000)
+pm2 start manzio-backend/server.js --name "manzio-backend"
+
+# Start website & admin (Port 3000)
+pm2 start npm --name "manzio-web" -- start
+
+# Persist processes across server reboots
+pm2 save
+pm2 startup
+```
+
+### 3. Nginx Reverse Proxy
+Forward traffic on port 80 / 443 to port 3000:
+```nginx
+server {
+    server_name travinno.com www.travinno.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+---
+
+## 🔑 Default Admin Credentials
+- **Username**: `admin` (or `rohanvijesh607@gmail.com`)
+- **Password**: `admin`
