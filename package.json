@@ -8,8 +8,8 @@
     "dev:backend": "node manzio-backend/server.js",
     "dev:admin": "npm --prefix manzio-admin run dev",
     "build:admin": "npm --prefix manzio-admin run build",
-    "build": "npm --prefix manzio-admin run build && next build",
-    "build:all": "npm --prefix manzio-admin run build && next build",
+    "build": "npm --prefix manzio-admin run build && next build && powershell -Command \"Remove-Item -Recurse -Force _next -ErrorAction SilentlyContinue; Copy-Item -Recurse -Force out/_next ./; Copy-Item -Force out/*.html ./; Copy-Item -Recurse -Force out/blog ./ -ErrorAction SilentlyContinue\"",
+    "build:all": "npm --prefix manzio-admin run build && next build && powershell -Command \"Remove-Item -Recurse -Force _next -ErrorAction SilentlyContinue; Copy-Item -Recurse -Force out/_next ./; Copy-Item -Force out/*.html ./; Copy-Item -Recurse -Force out/blog ./ -ErrorAction SilentlyContinue\"",
     "start": "node server.js",
     "start:next": "next start",
     "lint": "eslint"
