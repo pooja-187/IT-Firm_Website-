@@ -622,14 +622,10 @@ export default function Home() {
   const servicesRef = useRef<HTMLDivElement>(null);
   const processSectionRef = useRef<HTMLElement>(null);
   const statsSectionRef = useRef<HTMLElement>(null);
-  const starsVideoRef = useRef<HTMLVideoElement>(null);
   const [activeService, setActiveService] = useState(0);
 
   // Viewport tracking variables:
   const isStatsInView = useInView(statsSectionRef, { once: false, margin: "200px" });
-  // 1. shouldLoadStars: Pre-loads the stars video when services section is within 800px of entering viewport
-  const shouldLoadStars = useInView(servicesRef, { once: true, margin: "800px 0px 800px 0px" });
-  // 2. isServicesVisible: Strictly checks when the services section is visibly active in viewport
   const isServicesVisible = useInView(servicesRef, { once: false, margin: "0px" });
 
   // Track scroll progress of stats section exiting the viewport
@@ -697,91 +693,6 @@ export default function Home() {
     });
     return () => unsubscribe();
   }, [servicesStickyScrollYProgress]);
-
-  // ─── Stars video: viewport playback control (play when visible, pause when off-screen) ───
-  useEffect(() => {
-    const video = starsVideoRef.current;
-    if (!video || !shouldLoadStars) return;
-
-    if (isServicesVisible) {
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {});
-      }
-    } else {
-      video.pause();
-    }
-  }, [isServicesVisible, shouldLoadStars]);
-
-  // ─── Stars video: event-driven scroll-reactive playbackRate ───────────────
-  useEffect(() => {
-    if (!isServicesVisible) return; // Completely freeze velocity calculations when services is out of view!
-
-    const video = starsVideoRef.current;
-    if (!video) return;
-
-    const BASE_RATE = 1.0;     // calm floating speed
-    const MAX_RATE  = 2.0;     // peak speed during fast scroll
-    const RISE_EASE = 0.12;    // how quickly rate climbs  (higher = faster response)
-    const FALL_EASE = 0.055;   // how slowly rate decays back to base (lower = silkier)
-
-    let lastScrollY  = window.scrollY;
-    let smoothVel    = 0;        // smoothed velocity magnitude (px/frame)
-    let currentRate  = BASE_RATE;
-    let rafId: number | null = null;
-    let isRunning = false;
-
-    const tick = () => {
-      // 1. Raw velocity this frame
-      const curY = window.scrollY;
-      const rawVel = Math.abs(curY - lastScrollY);
-      lastScrollY  = curY;
-
-      // 2. Smooth velocity — fast rise, slow fall
-      const ease = rawVel > smoothVel ? RISE_EASE : FALL_EASE;
-      smoothVel += (rawVel - smoothVel) * ease;
-
-      // 3. Map smoothed velocity → target playbackRate
-      const targetRate = BASE_RATE + Math.min(smoothVel / 20, 1) * (MAX_RATE - BASE_RATE);
-
-      // 4. Smoothly interpolate current rate toward target
-      currentRate += (targetRate - currentRate) * 0.08;
-
-      // 5. Apply only when meaningful change (avoid unnecessary DOM writes)
-      if (Math.abs(currentRate - video.playbackRate) > 0.005) {
-        video.playbackRate = currentRate;
-      }
-
-      // If velocity has returned to zero and rate has returned to base rate, sleep the loop!
-      if (smoothVel < 0.01 && Math.abs(currentRate - BASE_RATE) < 0.01) {
-        video.playbackRate = BASE_RATE;
-        isRunning = false;
-        rafId = null;
-        return;
-      }
-
-      rafId = requestAnimationFrame(tick);
-    };
-
-    const onScroll = () => {
-      if (!isRunning) {
-        isRunning = true;
-        lastScrollY = window.scrollY;
-        rafId = requestAnimationFrame(tick);
-      }
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
-      isRunning = false;
-    };
-  }, [isServicesVisible]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
