@@ -624,13 +624,10 @@ export default function WorkPage() {
               </div>
             }
           >
-            {/* Temporarily disabled for black screen video removal test */}
-            <div
-              className="w-full h-full bg-black rounded-2xl border border-white/10"
-              style={{
-                transform: "translateZ(0)",
-                backfaceVisibility: "hidden"
-              }}
+            {/* Solid Black Area (Temporary Diagnostic Test) */}
+            <div 
+              className="w-full h-full bg-black rounded-2xl flex items-center justify-center border border-white/10"
+              style={{ backgroundColor: "#000000" }}
             />
           </ContainerScroll>
 

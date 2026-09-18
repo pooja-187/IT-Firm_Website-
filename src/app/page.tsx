@@ -807,10 +807,11 @@ export default function Home() {
       {/* Section with fullscreen raw cinematic background video, subtle readability overlay, top vignette fade, and vertically centered hero content */}
       <section className="relative min-h-[100svh] md:min-h-screen w-full flex flex-col items-center justify-center select-none overflow-hidden">
 
-        {/* FULLSCREEN VIDEO (Temporarily disabled for black screen video removal test) */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none select-none bg-black">
-          <div className="w-full h-full bg-black" />
-        </div>
+        {/* FULLSCREEN SOLID BLACK BACKGROUND (Temporary Diagnostic Test) */}
+        <div 
+          className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none select-none bg-black" 
+          style={{ backgroundColor: "#000000" }} 
+        />
 
         {/* OVERLAYS */}
         {/* 2a. Base dimming readability mask - slightly darker on mobile for cinematic readability */}
@@ -1482,10 +1483,10 @@ export default function Home() {
             className="relative w-full h-full flex items-center justify-center"
           >
 
-            {/* ── Video background (Temporarily disabled for black screen video removal test) ─── */}
+            {/* ── Solid Black Background (Temporary Diagnostic Test) ──────────────── */}
             <div
-              className="absolute inset-0 w-full h-full bg-black pointer-events-none select-none"
-              style={{ zIndex: 0 }}
+              className="absolute inset-0 w-full h-full pointer-events-none select-none bg-black"
+              style={{ zIndex: 0, backgroundColor: "#000000" }}
             />
 
             {/* ── Cinematic dark overlay (dims the video, keeps text readable) */}
