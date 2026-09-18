@@ -807,19 +807,9 @@ export default function Home() {
       {/* Section with fullscreen raw cinematic background video, subtle readability overlay, top vignette fade, and vertically centered hero content */}
       <section className="relative min-h-[100svh] md:min-h-screen w-full flex flex-col items-center justify-center select-none overflow-hidden">
 
-        {/* FULLSCREEN VIDEO */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none select-none">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster="/videos/hero-poster.webp"
-            className="w-full h-full object-cover"
-          >
-            <source src="/videos/hero-video.mp4" type="video/mp4" />
-          </video>
+        {/* FULLSCREEN VIDEO (Temporarily disabled for black screen video removal test) */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none select-none bg-black">
+          <div className="w-full h-full bg-black" />
         </div>
 
         {/* OVERLAYS */}
@@ -1492,16 +1482,9 @@ export default function Home() {
             className="relative w-full h-full flex items-center justify-center"
           >
 
-            {/* ── Video background ─────────────────────────────────────── */}
-            <video
-              ref={starsVideoRef}
-              muted
-              loop
-              playsInline
-              preload={shouldLoadStars ? "metadata" : "none"}
-              poster="/videos/stars-poster.webp"
-              src={shouldLoadStars ? "/videos/stars-bg.mp4" : undefined}
-              className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+            {/* ── Video background (Temporarily disabled for black screen video removal test) ─── */}
+            <div
+              className="absolute inset-0 w-full h-full bg-black pointer-events-none select-none"
               style={{ zIndex: 0 }}
             />
 

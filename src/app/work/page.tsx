@@ -624,24 +624,14 @@ export default function WorkPage() {
               </div>
             }
           >
-            <video
-              ref={videoRef}
-              key="/videos/work_video_dynamic.mp4?v=3"
-              src="/videos/work_video_dynamic.mp4?v=3"
-              className="w-full h-full object-cover rounded-2xl"
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="auto"
+            {/* Temporarily disabled for black screen video removal test */}
+            <div
+              className="w-full h-full bg-black rounded-2xl border border-white/10"
               style={{
                 transform: "translateZ(0)",
-                willChange: "transform",
                 backfaceVisibility: "hidden"
               }}
-            >
-              <source src="/videos/work_video_dynamic.mp4?v=3" type="video/mp4" />
-            </video>
+            />
           </ContainerScroll>
 
           {/* Category Filter Pills */}
