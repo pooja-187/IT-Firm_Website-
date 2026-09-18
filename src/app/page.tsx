@@ -205,31 +205,36 @@ function StatsGlowTrail({ parentRef, inView }: StatsGlowTrailProps) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animFrameId: number;
+    let animFrameId: number | null = null;
     let width = parent.clientWidth;
     let height = parent.clientHeight;
     
     // Scale canvas backings according to device pixel ratio for super crisp glitter circles
-    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx.scale(dpr, dpr);
+    const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 1.5) : 1;
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     const handleResize = () => {
       width = parent.clientWidth;
       height = parent.clientHeight;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     window.addEventListener("resize", handleResize, { passive: true });
 
-    // Main particle update and draw loop
+    // Main particle update and draw loop (EVENT-DRIVEN: sleeps when sparkles array is empty)
     const updateAndDrawParticles = () => {
       ctx.clearRect(0, 0, width, height);
 
-      const now = Date.now();
       const sparkles = sparklesRef.current;
+      if (sparkles.length === 0) {
+        animFrameId = null;
+        return;
+      }
+
+      const now = Date.now();
 
       for (let i = sparkles.length - 1; i >= 0; i--) {
         const p = sparkles[i];
@@ -256,22 +261,15 @@ function StatsGlowTrail({ parentRef, inView }: StatsGlowTrailProps) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size * (1 - lifeRatio * 0.4), 0, Math.PI * 2);
         ctx.fillStyle = p.color.replace("ALPHA", currentAlpha.toString());
-        
-        if (p.size > 2.6) {
-          ctx.save();
-          ctx.shadowBlur = p.size * 2.5;
-          ctx.shadowColor = p.glowColor;
-          ctx.fill();
-          ctx.restore();
-        } else {
-          ctx.fill();
-        }
+        ctx.fill();
       }
 
-      animFrameId = requestAnimationFrame(updateAndDrawParticles);
+      if (sparkles.length > 0) {
+        animFrameId = requestAnimationFrame(updateAndDrawParticles);
+      } else {
+        animFrameId = null;
+      }
     };
-
-    animFrameId = requestAnimationFrame(updateAndDrawParticles);
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = parent.getBoundingClientRect();
@@ -340,6 +338,10 @@ function StatsGlowTrail({ parentRef, inView }: StatsGlowTrailProps) {
               glowColor: glowColors[randIdx],
             });
           }
+
+          if (animFrameId === null) {
+            animFrameId = requestAnimationFrame(updateAndDrawParticles);
+          }
         }
       }
 
@@ -369,7 +371,7 @@ function StatsGlowTrail({ parentRef, inView }: StatsGlowTrailProps) {
       window.removeEventListener("resize", handleResize);
       parent.removeEventListener("mousemove", handleMouseMove);
       parent.removeEventListener("mouseleave", handleMouseLeave);
-      cancelAnimationFrame(animFrameId);
+      if (animFrameId !== null) cancelAnimationFrame(animFrameId);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [parentRef, x, y, scaleX, scaleY, rotate, opacity, inView]);
@@ -544,16 +546,27 @@ export default function Home() {
 
   const [activeStep, setActiveStep] = useState<number | null>(0); // Initialize with first step active by default
   const [hoveredCardIdx, setHoveredCardIdx] = useState<number | null>(null);
-  const [cardMousePos, setCardMousePos] = useState({ x: 0, y: 0 });
+
+  // Mouse tracking motion values for the spotlight effect in the Development Process section
+  const processContainerRef = useRef<HTMLDivElement>(null);
+  const isProcessInView = useInView(processContainerRef, { margin: "200px 0px" });
+  const processMouseX = useMotionValue(0);
+  const processMouseY = useMotionValue(0);
+  
+  // Springs for buttery smooth mouse interpolation
+  const processMouseXSpring = useSpring(processMouseX, { stiffness: 120, damping: 20 });
+  const processMouseYSpring = useSpring(processMouseY, { stiffness: 120, damping: 20 });
+  const [isProcessHovered, setIsProcessHovered] = useState(false);
 
   // Autoplay progression for the interactive process journey with custom dynamic timing
   useEffect(() => {
-    // Autoplay is active only when not hovered
-    if (hoveredCardIdx !== null) return;
+    // Autoplay is active only when in viewport and not hovered
+    if (!isProcessInView || hoveredCardIdx !== null) return;
 
     let timeoutId: NodeJS.Timeout;
 
     const tick = () => {
+      if (document.hidden) return;
       setActiveStep((prev) => {
         const nextStep = prev === null ? 0 : (prev + 1) % 5;
         return nextStep;
@@ -566,17 +579,7 @@ export default function Home() {
     timeoutId = setTimeout(tick, delay);
 
     return () => clearTimeout(timeoutId);
-  }, [hoveredCardIdx, activeStep]);
-
-  // Mouse tracking motion values for the spotlight effect in the Development Process section
-  const processContainerRef = useRef<HTMLDivElement>(null);
-  const processMouseX = useMotionValue(0);
-  const processMouseY = useMotionValue(0);
-  
-  // Springs for buttery smooth mouse interpolation
-  const processMouseXSpring = useSpring(processMouseX, { stiffness: 120, damping: 20 });
-  const processMouseYSpring = useSpring(processMouseY, { stiffness: 120, damping: 20 });
-  const [isProcessHovered, setIsProcessHovered] = useState(false);
+  }, [isProcessInView, hoveredCardIdx, activeStep]);
 
   const handleProcessMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!processContainerRef.current) return;
@@ -585,12 +588,29 @@ export default function Home() {
     processMouseY.set(e.clientY - rect.top);
   };
 
-  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleCardMouseEnter = (e: React.MouseEvent<HTMLDivElement>, idx: number) => {
+    setHoveredCardIdx(idx);
     const rect = e.currentTarget.getBoundingClientRect();
-    setCardMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
+    (e.currentTarget as any)._cardRect = rect;
+    e.currentTarget.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+    e.currentTarget.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+  };
+
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    let rect = (e.currentTarget as any)._cardRect;
+    if (!rect) {
+      rect = e.currentTarget.getBoundingClientRect();
+      (e.currentTarget as any)._cardRect = rect;
+    }
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty("--mouse-x", `${x}px`);
+    e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
+  };
+
+  const handleCardMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    setHoveredCardIdx(null);
+    delete (e.currentTarget as any)._cardRect;
   };
 
   // Top-level unconditional definition of motion templates to strictly satisfy the Rules of Hooks
@@ -605,9 +625,12 @@ export default function Home() {
   const starsVideoRef = useRef<HTMLVideoElement>(null);
   const [activeService, setActiveService] = useState(0);
 
-  // Viewport tracking variables for heavy dynamic calculations
+  // Viewport tracking variables:
   const isStatsInView = useInView(statsSectionRef, { once: false, margin: "200px" });
-  const isServicesInView = useInView(servicesRef, { once: false, margin: "200px" });
+  // 1. shouldLoadStars: Pre-loads the stars video when services section is within 800px of entering viewport
+  const shouldLoadStars = useInView(servicesRef, { once: true, margin: "800px 0px 800px 0px" });
+  // 2. isServicesVisible: Strictly checks when the services section is visibly active in viewport
+  const isServicesVisible = useInView(servicesRef, { once: false, margin: "0px" });
 
   // Track scroll progress of stats section exiting the viewport
   const { scrollYProgress: statsExitScrollYProgress } = useScroll({
@@ -675,9 +698,24 @@ export default function Home() {
     return () => unsubscribe();
   }, [servicesStickyScrollYProgress]);
 
-  // ─── Stars video: scroll-reactive playbackRate ───────────────────────────
+  // ─── Stars video: viewport playback control (play when visible, pause when off-screen) ───
   useEffect(() => {
-    if (!isServicesInView) return; // Freeze velocity calculations when services is out of view!
+    const video = starsVideoRef.current;
+    if (!video || !shouldLoadStars) return;
+
+    if (isServicesVisible) {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {});
+      }
+    } else {
+      video.pause();
+    }
+  }, [isServicesVisible, shouldLoadStars]);
+
+  // ─── Stars video: event-driven scroll-reactive playbackRate ───────────────
+  useEffect(() => {
+    if (!isServicesVisible) return; // Completely freeze velocity calculations when services is out of view!
 
     const video = starsVideoRef.current;
     if (!video) return;
@@ -690,7 +728,8 @@ export default function Home() {
     let lastScrollY  = window.scrollY;
     let smoothVel    = 0;        // smoothed velocity magnitude (px/frame)
     let currentRate  = BASE_RATE;
-    let rafId: number;
+    let rafId: number | null = null;
+    let isRunning = false;
 
     const tick = () => {
       // 1. Raw velocity this frame
@@ -703,7 +742,6 @@ export default function Home() {
       smoothVel += (rawVel - smoothVel) * ease;
 
       // 3. Map smoothed velocity → target playbackRate
-      //    velocity of ~20px/frame → full MAX_RATE
       const targetRate = BASE_RATE + Math.min(smoothVel / 20, 1) * (MAX_RATE - BASE_RATE);
 
       // 4. Smoothly interpolate current rate toward target
@@ -714,12 +752,36 @@ export default function Home() {
         video.playbackRate = currentRate;
       }
 
+      // If velocity has returned to zero and rate has returned to base rate, sleep the loop!
+      if (smoothVel < 0.01 && Math.abs(currentRate - BASE_RATE) < 0.01) {
+        video.playbackRate = BASE_RATE;
+        isRunning = false;
+        rafId = null;
+        return;
+      }
+
       rafId = requestAnimationFrame(tick);
     };
 
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [isServicesInView]);
+    const onScroll = () => {
+      if (!isRunning) {
+        isRunning = true;
+        lastScrollY = window.scrollY;
+        rafId = requestAnimationFrame(tick);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      isRunning = false;
+    };
+  }, [isServicesVisible]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -752,6 +814,8 @@ export default function Home() {
             muted
             loop
             playsInline
+            preload="metadata"
+            poster="/videos/hero-poster.webp"
             className="w-full h-full object-cover"
           >
             <source src="/videos/hero-video.mp4" type="video/mp4" />
@@ -1165,8 +1229,8 @@ export default function Home() {
                   <motion.div
                     key={idx}
                     onClick={() => setActiveStep(idx)}
-                    onMouseEnter={() => setHoveredCardIdx(idx)}
-                    onMouseLeave={() => setHoveredCardIdx(null)}
+                    onMouseEnter={(e) => handleCardMouseEnter(e, idx)}
+                    onMouseLeave={handleCardMouseLeave}
                     onMouseMove={handleCardMouseMove}
                     animate={{
                       scale: isHovered ? 1.03 : isHighlighted ? 1.015 : 1.0,
@@ -1210,7 +1274,7 @@ export default function Home() {
                         className="absolute inset-0 pointer-events-none -z-10 mix-blend-screen transition-opacity duration-500"
                         style={{
                           background: isHovered
-                            ? `radial-gradient(120px circle at ${cardMousePos.x}px ${cardMousePos.y}px, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.05) 50%, transparent 100%)`
+                            ? `radial-gradient(120px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.05) 50%, transparent 100%)`
                             : `radial-gradient(150px circle at 50% 50%, rgba(168, 85, 247, 0.12), rgba(236, 72, 153, 0.03) 50%, transparent 100%)`
                         }}
                       />
@@ -1431,15 +1495,15 @@ export default function Home() {
             {/* ── Video background ─────────────────────────────────────── */}
             <video
               ref={starsVideoRef}
-              autoPlay
               muted
               loop
               playsInline
+              preload={shouldLoadStars ? "metadata" : "none"}
+              poster="/videos/stars-poster.webp"
+              src={shouldLoadStars ? "/videos/stars-bg.mp4" : undefined}
               className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
               style={{ zIndex: 0 }}
-            >
-              <source src="/videos/stars-bg.mp4" type="video/mp4" />
-            </video>
+            />
 
             {/* ── Cinematic dark overlay (dims the video, keeps text readable) */}
             <div

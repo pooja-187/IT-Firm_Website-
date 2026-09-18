@@ -93,33 +93,90 @@ const AnimatedGradientBackground: React.FC<AnimatedGradientBackgroundProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    let animationFrame: number;
+    const gradientStopsString = gradientStops
+      .map((stop, index) => `${gradientColors[index]} ${stop}%`)
+      .join(", ");
+
+    const applyGradient = (w: number) => {
+      if (containerRef.current) {
+        containerRef.current.style.background = `radial-gradient(${w}% ${w + topOffset}% at 50% 20%, ${gradientStopsString})`;
+      }
+    };
+
+    // If breathing is disabled, render static gradient once with zero RAF overhead
+    if (!Breathing) {
+      applyGradient(startingGap);
+      return;
+    }
+
+    let animationFrame: number | null = null;
     let width = startingGap;
     let directionWidth = 1;
+    let isVisible = true;
 
     const animateGradient = () => {
+      if (!isVisible || document.hidden) {
+        animationFrame = null;
+        return;
+      }
+
       if (width >= startingGap + breathingRange) directionWidth = -1;
       if (width <= startingGap - breathingRange) directionWidth = 1;
 
-      if (!Breathing) directionWidth = 0;
       width += directionWidth * animationSpeed;
-
-      const gradientStopsString = gradientStops
-        .map((stop, index) => `${gradientColors[index]} ${stop}%`)
-        .join(", ");
-
-      const gradient = `radial-gradient(${width}% ${width + topOffset}% at 50% 20%, ${gradientStopsString})`;
-
-      if (containerRef.current) {
-        containerRef.current.style.background = gradient;
-      }
+      applyGradient(width);
 
       animationFrame = requestAnimationFrame(animateGradient);
     };
 
-    animationFrame = requestAnimationFrame(animateGradient);
+    const startAnimation = () => {
+      if (animationFrame === null && isVisible && !document.hidden) {
+        animationFrame = requestAnimationFrame(animateGradient);
+      }
+    };
 
-    return () => cancelAnimationFrame(animationFrame);
+    const stopAnimation = () => {
+      if (animationFrame !== null) {
+        cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+      }
+    };
+
+    // IntersectionObserver to freeze animation when scrolled out of view
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== "undefined" && containerRef.current) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          isVisible = entry.isIntersecting;
+          if (isVisible) {
+            startAnimation();
+          } else {
+            stopAnimation();
+          }
+        },
+        { rootMargin: "200px" }
+      );
+      observer.observe(containerRef.current);
+    } else {
+      startAnimation();
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopAnimation();
+      } else if (isVisible) {
+        startAnimation();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      stopAnimation();
+      if (observer) observer.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [startingGap, Breathing, gradientColors, gradientStops, animationSpeed, breathingRange, topOffset]);
 
   return (

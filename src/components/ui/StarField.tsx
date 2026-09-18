@@ -11,7 +11,7 @@ interface Particle {
   vy: number;
   baseOpacity: number;
   parallaxScale: number;
-  blurAmount: number;
+  isGlowing: boolean;
   shimmerSpeed: number;
   shimmerOffset: number;
 }
@@ -27,7 +27,7 @@ const FAR_LAYER_CONFIG = {
   speedX: 0.012,
   speedY: 0.018,
   parallax: 0.04,
-  blur: 0,
+  glow: false,
 };
 
 const MID_LAYER_CONFIG = {
@@ -39,7 +39,7 @@ const MID_LAYER_CONFIG = {
   speedX: 0.024,
   speedY: 0.035,
   parallax: 0.12,
-  blur: 0,
+  glow: false,
 };
 
 const NEAR_LAYER_CONFIG = {
@@ -51,11 +51,35 @@ const NEAR_LAYER_CONFIG = {
   speedX: 0.045,
   speedY: 0.060,
   parallax: 0.35,
-  blur: 1.5, // Subtle radial blur/glow to mimic a depth-of-field camera lens
+  glow: true, // Subtle radial glow to mimic depth-of-field camera lens focus
 };
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
+}
+
+// Pre-render a reusable glowing star sprite onto an offscreen canvas (zero per-frame CPU Gaussian blurs)
+function createGlowSprite(): HTMLCanvasElement | null {
+  if (typeof document === "undefined") return null;
+  const sprite = document.createElement("canvas");
+  const size = 32;
+  sprite.width = size;
+  sprite.height = size;
+  const sCtx = sprite.getContext("2d");
+  if (!sCtx) return null;
+
+  const half = size / 2;
+  const gradient = sCtx.createRadialGradient(half, half, 0, half, half, half);
+  gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+  gradient.addColorStop(0.2, "rgba(255, 255, 255, 0.85)");
+  gradient.addColorStop(0.45, "rgba(255, 255, 255, 0.25)");
+  gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+  sCtx.fillStyle = gradient;
+  sCtx.beginPath();
+  sCtx.arc(half, half, half, 0, Math.PI * 2);
+  sCtx.fill();
+  return sprite;
 }
 
 // ─── Public export ────────────────────────────────────────────────────────────
@@ -66,14 +90,18 @@ export function StarField() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    let animationFrameId: number;
+    // Cache pre-rendered glow sprite
+    const glowSprite = createGlowSprite();
+
+    let animationFrameId: number | null = null;
     let particles: Particle[] = [];
     let width = window.innerWidth;
     let height = window.innerHeight;
     let dpr = 1;
+    let isRunning = false;
 
     // High performance scroll velocity tracking
     let lastScrollY = typeof window !== "undefined" ? window.scrollY : 0;
@@ -87,12 +115,12 @@ export function StarField() {
     const handleResize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      dpr = window.devicePixelRatio || 1;
+      // Cap DPR to 1.5 to maintain razor-sharp stars while avoiding multi-million pixel fill-rate penalties
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
-      // Scale canvas backings according to device pixel ratio for super crisp rendering
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // Re-distribute existing particles within new canvas dimensions
       particles.forEach((p) => {
@@ -122,7 +150,7 @@ export function StarField() {
             vy,
             baseOpacity,
             parallaxScale: config.parallax,
-            blurAmount: config.blur ? lerp(0.4, config.blur, Math.random()) : 0,
+            isGlowing: config.glow,
             shimmerSpeed: lerp(0.0008, 0.0025, Math.random()),
             shimmerOffset: Math.random() * Math.PI * 2,
           });
@@ -138,10 +166,10 @@ export function StarField() {
     handleResize();
     createParticles();
 
-    window.addEventListener("resize", handleResize, { passive: true });
-
-    // Main animation render loop (highly-optimized RAF)
+    // Main animation render loop (highly-optimized RAF with zero shadowBlur CPU penalties)
     const render = () => {
+      if (!isRunning) return;
+
       ctx.clearRect(0, 0, width, height);
 
       // 1. Calculate instantaneous scroll delta
@@ -177,20 +205,23 @@ export function StarField() {
         const shimmer = 0.82 + 0.18 * Math.sin(now * p.shimmerSpeed + p.shimmerOffset);
         const opacity = Math.min(1.0, Math.max(0.0, p.baseOpacity * shimmer));
 
-        // Render circular dot
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
-
-        // Apply visual lens glow only to foreground particles to save performance
-        if (p.blurAmount > 0) {
-          ctx.save();
-          ctx.fillStyle = `rgba(255, 255, 255, ${opacity * 0.85})`;
-          ctx.shadowColor = "rgba(255, 255, 255, 0.35)";
-          ctx.shadowBlur = p.blurAmount * 2.2;
-          ctx.fill();
-          ctx.restore();
+        // Render glowing near particles via pre-rendered hardware-accelerated sprite
+        if (p.isGlowing && glowSprite) {
+          const drawSize = p.size * 3.8;
+          ctx.globalAlpha = opacity;
+          ctx.drawImage(
+            glowSprite,
+            p.x - drawSize / 2,
+            p.y - drawSize / 2,
+            drawSize,
+            drawSize
+          );
         } else {
-          ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+          // Render standard circular star dot (zero state changes/saves)
+          ctx.globalAlpha = opacity;
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -198,12 +229,43 @@ export function StarField() {
       animationFrameId = requestAnimationFrame(render);
     };
 
-    render();
+    const startLoop = () => {
+      if (!isRunning) {
+        isRunning = true;
+        lastScrollY = window.scrollY;
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
+    const stopLoop = () => {
+      isRunning = false;
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+    };
+
+    // Tab visibility handling: pause animation when browser tab is inactive to preserve 100% CPU/Battery
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopLoop();
+      } else {
+        startLoop();
+      }
+    };
+
+    // Resize listener with passive flag
+    window.addEventListener("resize", handleResize, { passive: true });
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Start render loop
+    startLoop();
 
     // Clean up
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      stopLoop();
       window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 

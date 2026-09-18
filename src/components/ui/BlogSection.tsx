@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useInView } from "framer-motion";
 import { Clock, ArrowUpRight, X, BookOpen, Sparkles, Calendar } from "lucide-react";
 import Image from "next/image";
 import { apiService, Blog } from "@/utils/api";
@@ -47,6 +47,7 @@ export function BlogSection() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { margin: "200px 0px" });
 
   // Track scroll progress on entry and exit to enable cinematic fade transitions
   const { scrollYProgress: enterScroll } = useScroll({
@@ -90,14 +91,15 @@ export function BlogSection() {
     loadBlogs();
   }, []);
 
-  // Auto-rotation timer logic (cycles index every 3 seconds, pauses on hover/pause state)
+  // Auto-rotation timer logic (cycles index every 3 seconds, pauses on hover/pause state or when offscreen)
   useEffect(() => {
-    if (isPaused || blogs.length <= 1) return;
+    if (!isInView || isPaused || blogs.length <= 1) return;
     const interval = setInterval(() => {
+      if (document.hidden) return;
       setActiveIndex((prev) => (prev + 1) % blogs.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [isPaused, blogs.length]);
+  }, [isInView, isPaused, blogs.length]);
 
   // Extract the active featured blog
   const featuredBlog = blogs[activeIndex] || MOCK_BLOGS[0] || blogs[0];

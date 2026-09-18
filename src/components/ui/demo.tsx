@@ -1,23 +1,9 @@
 'use client';
 import React from 'react';
 import { cn } from '@/utils/cn';
-import Lenis from 'lenis';
 import { ZoomParallax } from "@/components/ui/zoom-parallax";
 
 export default function DefaultDemo() {
-
-	React.useEffect( () => {
-        const lenis = new Lenis()
-       
-        function raf(time: number) {
-            lenis.raf(time)
-            requestAnimationFrame(raf)
-        }
-
-        requestAnimationFrame(raf)
-    },[])
-
-
 	const images = [
 		{
 			src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1280&h=720&fit=crop&crop=entropy&auto=format&q=80',

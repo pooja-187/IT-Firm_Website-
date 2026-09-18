@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useInView } from "framer-motion";
 import { 
   TrendingUp, 
   Activity, 
@@ -56,6 +56,7 @@ const CountUp = ({ value, prefix = "", suffix = "", duration = 2.5 }: { value: n
 export default function EcosystemShowcase() {
   const [currentScene, setCurrentScene] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { margin: "200px 0px" });
   
   // Mouse mapping for 3D Parallax Drift
   const mouseX = useMotionValue(0);
@@ -73,11 +74,15 @@ export default function EcosystemShowcase() {
   const layer3Y = useTransform(smoothMouseY, (y) => y * 1.6);
 
   useEffect(() => {
+    if (!isInView) return;
+
     const timer = setInterval(() => {
+      if (document.hidden) return;
       setCurrentScene((prev) => (prev + 1) % 7);
     }, 9000); // 9 seconds per case study scene
+
     return () => clearInterval(timer);
-  }, []);
+  }, [isInView]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;

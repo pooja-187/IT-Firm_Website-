@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants, useInView } from "framer-motion";
 
 interface AnimatedTextCycleProps {
   words: string[];
@@ -16,6 +16,8 @@ export default function AnimatedTextCycle({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [width, setWidth] = useState("auto");
   const measureRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(containerRef, { margin: "100px 0px" });
 
   // Get the width of the current word
   useEffect(() => {
@@ -29,12 +31,15 @@ export default function AnimatedTextCycle({
   }, [currentIndex, words]);
 
   useEffect(() => {
+    if (!isInView || words.length <= 1) return;
+
     const timer = setInterval(() => {
+      if (document.hidden) return;
       setCurrentIndex((prevIndex) => (prevIndex + 1) % words.length);
     }, interval);
 
     return () => clearInterval(timer);
-  }, [interval, words.length]);
+  }, [isInView, interval, words.length]);
 
   // Container animation for the whole word
   const containerVariants: Variants = {
@@ -81,6 +86,7 @@ export default function AnimatedTextCycle({
 
       {/* Visible animated word */}
       <motion.span 
+        ref={containerRef}
         className="relative inline-block"
         animate={{ 
           width,

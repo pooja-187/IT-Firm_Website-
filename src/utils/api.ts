@@ -2,15 +2,15 @@ import axios from "axios";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+  (typeof window !== "undefined"
     ? "/api/"
-    : "http://127.0.0.1:8000/api/");
+    : "http://localhost:3000/api/");
 
 const BACKEND_BASE_HOST =
   process.env.NEXT_PUBLIC_BACKEND_HOST ||
-  (typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+  (typeof window !== "undefined"
     ? ""
-    : "http://127.0.0.1:8000");
+    : "http://localhost:3000");
 
 // Reusable Axios client
 export const api = axios.create({
