@@ -48,13 +48,12 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      data-scroll-behavior="smooth"
-      className={`${inter.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
+      className={`${inter.variable} ${geistMono.variable} antialiased`}
     >
       <head>
         <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet" />
       </head>
-      <body className="min-h-full flex flex-col text-text-primary" style={{ backgroundColor: '#050505' }}>
+      <body className="min-h-screen flex flex-col text-text-primary" style={{ backgroundColor: '#050505' }}>
 
         {/* FULL-VIEWPORT ATMOSPHERIC BACKGROUND — fixed, spans edge-to-edge regardless of container width */}
         <div className="fixed inset-0 pointer-events-none select-none" style={{ zIndex: 0 }}>

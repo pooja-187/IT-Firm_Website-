@@ -715,8 +715,8 @@ export default function Home() {
   return (
     <>
       {/* HERO SECTION */}
-      {/* Section with fullscreen raw cinematic background video, subtle readability overlay, top vignette fade, and vertically centered hero content */}
-      <section className="relative min-h-[100svh] md:min-h-screen w-full flex flex-col items-center justify-center select-none overflow-hidden">
+      {/* Section with fullscreen solid black background, subtle readability overlay, top vignette fade, and vertically centered hero content */}
+      <section id="home" className="relative min-h-[100svh] md:min-h-screen w-full flex flex-col items-center justify-center select-none overflow-hidden">
 
         {/* FULLSCREEN SOLID BLACK BACKGROUND (Temporary Diagnostic Test) */}
         <div 
@@ -729,14 +729,14 @@ export default function Home() {
         <div 
           className="absolute inset-0 z-10 pointer-events-none select-none bg-black/55 sm:bg-black/45" 
         />
-        {/* 2b. Smooth top fade blending the video behind the transparent navbar */}
+        {/* 2b. Smooth top fade blending behind the transparent navbar */}
         <div 
           className="absolute top-0 left-0 right-0 h-[280px] z-10 pointer-events-none select-none" 
           style={{
             background: "linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.75) 18%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0) 100%)"
           }}
         />
-        {/* 2c. Smooth bottom fade blending the video into the dark cinematic background */}
+        {/* 2c. Smooth bottom fade blending into the dark cinematic background */}
         <div 
           className="absolute bottom-0 left-0 right-0 h-[280px] z-10 pointer-events-none select-none" 
           style={{
@@ -748,32 +748,30 @@ export default function Home() {
         {/* CONTENT CONTAINER - pt shifted to prevent overlapping with floating navbar */}
         <AppContainer className="relative z-40 w-full pt-24 sm:pt-[12vh] pb-16 flex flex-col items-center justify-center">
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="w-full flex flex-col items-center text-center px-12 sm:px-6"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full flex flex-col items-center text-center px-6 sm:px-6"
           >
 
             {/* Sub-Header Badge */}
-            <motion.div
-              variants={itemVariants}
-              className="mb-8 sm:mb-10 flex items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-3.5 py-1.5 md:px-5 md:py-2 backdrop-blur-md max-w-full overflow-hidden"
+            <div
+              className="mb-6 sm:mb-10 flex items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-3.5 py-1.5 md:px-5 md:py-2 backdrop-blur-md max-w-full overflow-hidden"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-brand-purple animate-pulse shrink-0" />
               <span className="text-[9px] sm:text-[11px] font-medium uppercase tracking-[0.12em] sm:tracking-[0.22em] text-white/40 truncate text-center">
                 {"Kerala’s Leading Software Builders"}
               </span>
-            </motion.div>
+            </div>
 
             {/* Headline */}
-            <motion.h1
-              variants={itemVariants}
-              className="mb-6 sm:mb-8 md:mb-10 w-full max-w-[295px] sm:max-w-2xl md:max-w-[1100px] text-center text-balance"
+            <h1
+              className="mb-6 sm:mb-8 md:mb-10 w-full max-w-[340px] sm:max-w-2xl md:max-w-[1100px] text-center text-balance"
               style={{
                 fontFamily: "Satoshi, sans-serif",
                 fontWeight: 700,
-                fontSize: "clamp(1.65rem, 5.2vw, 6.2rem)",
-                lineHeight: 0.95,
+                fontSize: "clamp(1.75rem, 5.2vw, 6.2rem)",
+                lineHeight: 1.05,
                 letterSpacing: "-0.04em",
                 color: "rgba(255,255,255,0.96)",
                 textShadow: "0 0 24px rgba(255,255,255,0.08), 0 0 80px rgba(180,120,255,0.08)",
@@ -781,25 +779,11 @@ export default function Home() {
             >
               <span className="text-transparent bg-clip-text bg-gradient-to-b from-white via-white/95 to-white/80 block sm:inline">
                 <span className="inline-block whitespace-nowrap">{"Kerala's "}</span>
-                {/* Keep the #1 purple, override the transparent text clip, and add dramatic landing animation */}
-                <motion.span 
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.8 },
-                    show: { 
-                      opacity: 1, 
-                      scale: 1, 
-                      transition: { 
-                        delay: 0.9, 
-                        type: "spring", 
-                        stiffness: 120, 
-                        damping: 15
-                      }
-                    }
-                  }}
+                <span 
                   className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#d8b4fe] via-[#a855f7] to-[#ec4899] drop-shadow-[0_0_15px_rgba(168,85,247,0.25)] font-bold whitespace-nowrap"
                 >
                   #1
-                </motion.span>
+                </span>
                 <span className="inline-block whitespace-nowrap">{" UI/UX Design &"}</span>
               </span>
               <br className="hidden sm:block" />
@@ -807,23 +791,22 @@ export default function Home() {
                 <span className="inline-block whitespace-nowrap">{" Software Development"}</span>{" "}
                 <span className="inline-block whitespace-nowrap">{"Studio"}</span>
               </span>
-            </motion.h1>
+            </h1>
 
             {/* Subtitle */}
-            <motion.p
-              variants={itemVariants}
-              className="mb-10 sm:mb-12 text-center font-normal px-4 max-w-[280px] sm:max-w-[640px] text-balance"
+            <p
+              className="mb-8 sm:mb-12 text-center font-normal px-4 max-w-[320px] sm:max-w-[640px] text-balance"
               style={{
-                fontSize: "clamp(0.85rem, 1.2vw, 1.05rem)",
+                fontSize: "clamp(0.9rem, 1.2vw, 1.05rem)",
                 lineHeight: 1.65,
-                color: "rgba(255,255,255,0.58)",
+                color: "rgba(255,255,255,0.7)",
               }}
             >
               We design, develop, and launch digital experiences that make an impact.
-            </motion.p>
+            </p>
 
             {/* CTA */}
-            <motion.div variants={itemVariants} className="mb-2">
+            <div className="mb-2">
               <Link
                 href="/chat"
                 className="group relative inline-flex items-center justify-center gap-1.5 overflow-hidden rounded-full px-5 py-2.5 text-[11px] sm:px-8 sm:py-3.5 sm:text-sm font-semibold text-white tracking-wider transition-all duration-500 bg-purple-600/25 hover:bg-purple-600/35 border border-purple-400/35 hover:border-purple-300/50 backdrop-blur-xl shadow-[0_8px_32px_rgba(124,58,237,0.3),inset_0_1px_1px_rgba(255,255,255,0.2)]"
@@ -841,7 +824,7 @@ export default function Home() {
                   <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </span>
               </Link>
-            </motion.div>
+            </div>
 
           </motion.div>
         </AppContainer>

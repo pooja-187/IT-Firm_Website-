@@ -103,14 +103,20 @@ export function StarField() {
     let dpr = 1;
     let isRunning = false;
 
-    // High performance scroll velocity tracking
-    let lastScrollY = typeof window !== "undefined" ? window.scrollY : 0;
+    // High performance scroll velocity tracking via passive event listener (zero RAF layout thrashing)
+    let currentScrollY = typeof window !== "undefined" ? window.scrollY : 0;
+    let lastScrollY = currentScrollY;
     let smoothScrollVelocity = 0;
     let ambientSpeedMultiplier = 1;
 
+    const handleScroll = () => {
+      currentScrollY = window.scrollY;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
     // Detect if we are on mobile to scale count and preserve CPU/Battery
     const isMobile = width < 768;
-    const countScale = isMobile ? 0.55 : 1.0;
+    const countScale = isMobile ? 0.45 : 1.0;
 
     const handleResize = () => {
       width = window.innerWidth;
@@ -172,8 +178,7 @@ export function StarField() {
 
       ctx.clearRect(0, 0, width, height);
 
-      // 1. Calculate instantaneous scroll delta
-      const currentScrollY = window.scrollY;
+      // 1. Calculate instantaneous scroll delta from passive listener
       const deltaY = currentScrollY - lastScrollY;
       lastScrollY = currentScrollY;
 
@@ -232,7 +237,8 @@ export function StarField() {
     const startLoop = () => {
       if (!isRunning) {
         isRunning = true;
-        lastScrollY = window.scrollY;
+        currentScrollY = window.scrollY;
+        lastScrollY = currentScrollY;
         animationFrameId = requestAnimationFrame(render);
       }
     };
@@ -264,6 +270,7 @@ export function StarField() {
     // Clean up
     return () => {
       stopLoop();
+      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };

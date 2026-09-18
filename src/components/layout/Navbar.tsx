@@ -59,10 +59,10 @@ export function Navbar() {
   const rawProgress = useTransform(scrollY, [0, 150], [0, 1]);
   const progress = useSpring(rawProgress, { stiffness: 90, damping: 20 });
 
-  // Spring-Linked Style Transformations (Width percentage limits: desktop: 95% -> 76%, mobile: 95% -> 92%)
-  const width = useTransform(progress, [0, 1], isMobile ? ["95%", "92%"] : ["95%", "76%"]);
-  const py = useTransform(progress, [0, 1], isMobile ? ["10px", "8px"] : ["16px", "10px"]);
-  const px = useTransform(progress, [0, 1], isMobile ? ["16px", "12px"] : ["32px", "20px"]);
+  // Spring-Linked Style Transformations
+  const width = useTransform(progress, [0, 1], ["95%", "80%"]);
+  const py = useTransform(progress, [0, 1], ["14px", "8px"]);
+  const px = useTransform(progress, [0, 1], ["24px", "14px"]);
   
   // Backdrop blur amount mapping
   const blurVal = useTransform(progress, [0, 1], [14, 22]);
