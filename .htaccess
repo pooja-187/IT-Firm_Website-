@@ -1,16 +1,16 @@
-# Guarantee LiteSpeed serves index.html by default
+# Options and DirectoryIndex
+Options -Indexes
 DirectoryIndex index.html index.php
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
-  # 1. Allow existing real files and directories to be served directly
-  RewriteCond %{REQUEST_FILENAME} -f [OR]
-  RewriteCond %{REQUEST_FILENAME} -d
+  # 1. Direct file requests (existing real files e.g. .js, .css, .png, .jpg, .woff2, .html, .ico, .svg)
+  RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule ^ - [L]
 
-  # 2. Automatically serve assets from public/ (videos, images, icons, etc.)
+  # 2. Automatically serve assets from public/ (images, icons, etc.)
   RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
   RewriteRule ^(.*)$ public/$1 [L]
 
@@ -20,13 +20,25 @@ DirectoryIndex index.html index.php
   # 4. Admin SPA routing: /admin and /admin/* -> public/admin/index.html
   RewriteRule ^admin(/.*)?$ public/admin/index.html [L]
 
-  # 5. Clean URLs: map /about -> about.html, /work -> work.html, etc.
+  # 5. Blog main listing: /blog and /blog/ -> blog/index.html
+  RewriteRule ^blog/?$ blog/index.html [L]
+
+  # 6. Blog article clean URLs: /blog/slug or /blog/slug/ -> blog/slug.html
+  RewriteCond %{DOCUMENT_ROOT}/blog/$1.html -f
+  RewriteRule ^blog/([^/]+)/?$ blog/$1.html [L]
+
+  # 7. Subfolder index clean URLs: e.g. /folder/ -> folder/index.html
+  RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
+  RewriteRule ^(.*)/?$ $1/index.html [L]
+
+  # 8. Top-level clean URLs: /about -> about.html, /work -> work.html, etc.
   RewriteCond %{DOCUMENT_ROOT}/$1.html -f
   RewriteRule ^([^/]+)/?$ $1.html [L]
 
-  # 6. Clean URLs for subfolders (e.g. /blog/slug -> blog/slug.html)
-  RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
-  RewriteRule ^(.*)/?$ $1/index.html [L]
+  # 9. Existing directories with index files
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_FILENAME}/index.html -f
+  RewriteRule ^ - [L]
 </IfModule>
 
 # Custom 404 Error Page
