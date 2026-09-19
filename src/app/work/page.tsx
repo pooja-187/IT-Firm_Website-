@@ -299,9 +299,9 @@ function splitTitleIntoTwoLines(title: string): React.ReactNode {
 
 export default function WorkPage() {
   const pageContainerRef = useRef<HTMLDivElement>(null);
-  const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const [projects, setProjects] = useState<ProjectItem[]>(MOCK_PROJECTS);
   const [activeFilter, setActiveFilter] = useState("ALL");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Mouse spotlight coordination variables
   const mouseX = useMotionValue(0);
@@ -412,12 +412,9 @@ export default function WorkPage() {
             };
           });
           setProjects(mapped);
-        } else {
-          setProjects(MOCK_PROJECTS);
         }
       } catch (err) {
         console.error("Failed fetching works, falling back to mock projects", err);
-        setProjects(MOCK_PROJECTS);
       } finally {
         setLoading(false);
       }
@@ -487,7 +484,24 @@ export default function WorkPage() {
       />
 
       {/* AMBIENT BACKGROUND GLOWS */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none -z-20">
+      {/* Mobile: Static radial gradients without expensive GPU blur filter and without infinite JS loops */}
+      <div className="block md:hidden absolute inset-0 pointer-events-none overflow-hidden select-none -z-20">
+        <div
+          className="absolute top-[10%] left-[-20%] w-[120vw] h-[50vh] rounded-full pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse at center, rgba(147, 51, 234, 0.12) 0%, rgba(236, 72, 153, 0.03) 45%, transparent 70%)"
+          }}
+        />
+        <div
+          className="absolute bottom-[20%] right-[-20%] w-[120vw] h-[50vh] rounded-full pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse at center, rgba(168, 85, 247, 0.10) 0%, rgba(236, 72, 153, 0.02) 45%, transparent 70%)"
+          }}
+        />
+      </div>
+
+      {/* Desktop: Original animated glows with blur filter */}
+      <div className="hidden md:block absolute inset-0 pointer-events-none overflow-hidden select-none -z-20">
         <motion.div
           className="absolute top-[15%] left-[-15%] w-[900px] h-[800px] rounded-full"
           style={{
@@ -531,7 +545,7 @@ export default function WorkPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center gap-2 text-xs font-normal text-white/30 mb-6 font-sans tracking-wide"
+            className="flex items-center gap-2 text-xs font-normal text-white/30 mb-6 font-sans tracking-wide mobile-visible"
           >
             <Link href="/" className="hover:text-purple-400 transition-colors">Home</Link>
             <span>&gt;</span>
@@ -547,7 +561,7 @@ export default function WorkPage() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-[11px] font-semibold uppercase tracking-[0.3em] text-purple-400 font-sans block mb-4"
+                  className="text-[11px] font-semibold uppercase tracking-[0.3em] text-purple-400 font-sans block mb-4 mobile-visible"
                 >
                   Selected Work
                 </motion.span>
@@ -557,7 +571,7 @@ export default function WorkPage() {
                   initial={{ opacity: 0, y: 25 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-white leading-[1.15] tracking-tight max-w-none mb-8 text-center"
+                  className="text-white leading-[1.15] tracking-tight max-w-none mb-8 text-center mobile-visible"
                   style={{
                     fontFamily: "Satoshi, sans-serif",
                     fontSize: "clamp(34px, 5.5vw, 68px)",
@@ -575,7 +589,7 @@ export default function WorkPage() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl font-normal tracking-wide mb-8 text-center text-pretty"
+                  className="text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl font-normal tracking-wide mb-8 text-center text-pretty mobile-visible"
                 >
                   A curated archive of immersive digital systems, full-stack enterprise nodes, optimized platforms, and cinematic user interfaces developed for forward-thinking brands.
                 </motion.p>
@@ -594,7 +608,7 @@ export default function WorkPage() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-wrap items-center gap-3 mb-20 relative z-10"
+            className="flex flex-wrap items-center gap-3 mb-20 relative z-10 mobile-visible"
           >
             {FILTERS.map((filter) => {
               const isActive = activeFilter === filter;
@@ -616,7 +630,7 @@ export default function WorkPage() {
           </motion.div>
 
           {/* Loading Indicator */}
-          {loading ? (
+          {loading && projects.length === 0 ? (
             <div className="w-full py-32 flex items-center justify-center">
               <div className="w-10 h-10 border-2 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
             </div>

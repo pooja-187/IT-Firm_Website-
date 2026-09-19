@@ -15,7 +15,16 @@ const HalideTopoHero: React.FC<HalideTopoHeroProps> = ({ children }) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Mouse Parallax Logic
+    const isMobile = window.innerWidth < 768;
+
+    // Mobile: Render canvas immediately visible without opacity:0 delay
+    if (isMobile) {
+      canvas.style.opacity = "1";
+      canvas.style.transform = "rotateX(55deg) rotateZ(-25deg) scale(1)";
+      return;
+    }
+
+    // Desktop: Mouse Parallax Logic
     const handleMouseMove = (e: MouseEvent) => {
       const x = (window.innerWidth / 2 - e.pageX) / 25;
       const y = (window.innerHeight / 2 - e.pageY) / 25;
@@ -33,7 +42,7 @@ const HalideTopoHero: React.FC<HalideTopoHeroProps> = ({ children }) => {
       });
     };
 
-    // Entrance Animation
+    // Desktop Entrance Animation
     canvas.style.opacity = "0";
     canvas.style.transform = "rotateX(90deg) rotateZ(0deg) scale(0.8)";
 
@@ -134,17 +143,19 @@ const HalideTopoHero: React.FC<HalideTopoHeroProps> = ({ children }) => {
 
       <div className="relative w-full overflow-hidden bg-[#0a0a0a]" style={{ minHeight: "100vh" }}>
 
-        {/* SVG Grain Filter */}
-        <svg style={{ position: "absolute", width: 0, height: 0 }}>
-          <filter id="halide-grain">
-            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" />
-            <feColorMatrix type="saturate" values="0" />
-          </filter>
-        </svg>
-        <div
-          className="pointer-events-none fixed inset-0 z-[100]"
-          style={{ filter: "url(#halide-grain)", opacity: 0.12 }}
-        />
+        {/* SVG Grain Filter - Desktop only to save mobile GPU from expensive feTurbulence rasterization */}
+        <div className="hidden md:block">
+          <svg style={{ position: "absolute", width: 0, height: 0 }}>
+            <filter id="halide-grain">
+              <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" />
+              <feColorMatrix type="saturate" values="0" />
+            </filter>
+          </svg>
+          <div
+            className="pointer-events-none fixed inset-0 z-[100]"
+            style={{ filter: "url(#halide-grain)", opacity: 0.12 }}
+          />
+        </div>
 
         {/* ── INTERFACE OVERLAY ── */}
         <div

@@ -36,11 +36,11 @@ export const ContainerScroll = ({
 
   return (
     <div
-      className="h-[50rem] md:h-[65rem] flex flex-col items-center justify-start relative p-2 md:p-6 pt-4 md:pt-10"
+      className="h-[28rem] sm:h-[36rem] md:h-[65rem] flex flex-col items-center justify-start relative p-2 md:p-6 pt-4 md:pt-10"
       ref={containerRef}
     >
       <div
-        className="py-4 md:py-10 w-full relative"
+        className="py-2 md:py-10 w-full relative"
         style={{
           perspective: "1000px",
         }}
@@ -91,7 +91,7 @@ export const Card = ({
           "0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 3px rgba(38, 38, 38, 1), 0 0 0 5px rgba(64, 64, 64, 1), 0 20px 40px rgba(0, 0, 0, 0.7), 0 45px 80px rgba(0, 0, 0, 0.6)",
       }}
       // Sleek landscape iPad Pro thin borders, rounded corners, and space grey backdrop
-      className="max-w-5xl -mt-12 mx-auto h-[30rem] md:h-[40rem] w-full relative bg-neutral-950 p-[12px] md:p-[16px] rounded-[32px] md:rounded-[40px] shadow-2xl overflow-visible"
+      className="max-w-5xl -mt-6 md:-mt-12 mx-auto h-[14rem] sm:h-[22rem] md:h-[40rem] w-full relative bg-neutral-950 p-[12px] md:p-[16px] rounded-[24px] md:rounded-[40px] shadow-2xl overflow-visible"
     >
       {/* Front Camera Sensor Dot */}
       <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0d0d0d] ring-1 ring-zinc-800/40 z-30 flex items-center justify-center opacity-80">

@@ -43,7 +43,7 @@ function slugify(text: string): string {
 export default function BlogListingPage() {
   const [blogs, setBlogs] = useState<Blog[]>(MOCK_BLOGS);
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Mouse spotlight tracker coordinates (follows cursor inside page)
   const mouseX = useMotionValue(0);
@@ -66,15 +66,12 @@ export default function BlogListingPage() {
   useEffect(() => {
     async function loadBlogs() {
       try {
-        setLoading(true);
         const fetchedBlogs = await apiService.getBlogs();
         if (fetchedBlogs && fetchedBlogs.length > 0) {
           setBlogs(fetchedBlogs);
         }
       } catch (err) {
-        console.error("Failed to load blog posts, using local defaults", err);
-      } finally {
-        setLoading(false);
+        console.error("Failed to load blog posts, keeping local defaults", err);
       }
     }
     loadBlogs();
@@ -149,7 +146,7 @@ export default function BlogListingPage() {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-md"
+          className="relative w-full max-w-md mobile-visible"
         >
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-white/30" />
@@ -170,7 +167,7 @@ export default function BlogListingPage() {
           {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
               MAIN ARTICLES CONTAINER
               ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-          {loading ? (
+          {loading && blogs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24">
               <div className="w-10 h-10 border-2 border-purple-500/25 border-t-purple-500 rounded-full animate-spin mb-4" />
               <span className="text-[10px] uppercase tracking-widest text-white/40">Syncing archives...</span>
@@ -199,7 +196,7 @@ export default function BlogListingPage() {
                         key={blog.id}
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-60px" }}
+                        viewport={{ once: true, margin: "100px" }}
                         transition={{ duration: 0.7, delay: (idx % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
                       >
                         <Link

@@ -62,9 +62,19 @@ export default function ClientsPage() {
   const buttonRef = useRef<HTMLAnchorElement>(null);
 
   // States
-  const [clientsList, setClientsList] = useState<any[]>([]);
+  const [clientsList, setClientsList] = useState<any[]>(
+    MOCK_CLIENTS.map((c) => normalizeClientType(c as any))
+  );
   const [activeFilter, setActiveFilter] = useState("ALL");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Mouse spotlight tracking
   const mouseX = useMotionValue(0);
@@ -114,14 +124,9 @@ export default function ClientsPage() {
             normalizeClientType(partner)
           );
           setClientsList(formatted);
-        } else {
-          setClientsList(MOCK_CLIENTS);
         }
       } catch (err) {
-        console.error("Failed to load partners, falling back to mocks", err);
-        setClientsList(MOCK_CLIENTS);
-      } finally {
-        setLoading(false);
+        console.error("Failed to load partners, keeping existing defaults", err);
       }
     }
     loadClients();
@@ -156,7 +161,24 @@ export default function ClientsPage() {
       />
 
       {/* AMBIENT BACKGROUND GLOWS */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none -z-20">
+      {/* Mobile: Static radial gradients without expensive GPU blur filter */}
+      <div className="block md:hidden absolute inset-0 pointer-events-none overflow-hidden select-none -z-20">
+        <div
+          className="absolute top-[-5%] left-[-15%] w-[120vw] h-[50vh] rounded-full pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse at center, rgba(139, 92, 246, 0.12) 0%, rgba(236, 72, 153, 0.03) 45%, transparent 70%)",
+          }}
+        />
+        <div
+          className="absolute bottom-[-5%] right-[-15%] w-[120vw] h-[50vh] rounded-full pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse at center, rgba(236, 72, 153, 0.08) 0%, transparent 70%)",
+          }}
+        />
+      </div>
+
+      {/* Desktop: Original animated glows with blur filter */}
+      <div className="hidden md:block absolute inset-0 pointer-events-none overflow-hidden select-none -z-20">
         <div
           className="absolute top-[-10%] left-[-10%] w-[900px] h-[900px] rounded-full"
           style={{
@@ -181,7 +203,7 @@ export default function ClientsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center gap-2 text-xs font-normal text-white/30 mb-6 font-sans tracking-wide"
+            className="flex items-center gap-2 text-xs font-normal text-white/30 mb-6 font-sans tracking-wide mobile-visible"
           >
             <Link href="/" className="hover:text-purple-400 transition-colors">Home</Link>
             <span>&gt;</span>
@@ -193,7 +215,7 @@ export default function ClientsPage() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[11px] font-semibold uppercase tracking-[0.3em] text-purple-400 font-sans block mb-4"
+            className="text-[11px] font-semibold uppercase tracking-[0.3em] text-purple-400 font-sans block mb-4 mobile-visible"
           >
             Our Network
           </motion.span>
@@ -203,7 +225,7 @@ export default function ClientsPage() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-white tracking-tight max-w-none mb-8 text-left"
+            className="text-white tracking-tight max-w-none mb-8 text-left mobile-visible"
             style={{
               fontFamily: "Satoshi, sans-serif",
               fontSize: "clamp(34px, 5.5vw, 68px)",
@@ -221,7 +243,7 @@ export default function ClientsPage() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl font-normal tracking-wide mb-16 text-pretty"
+            className="text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl font-normal tracking-wide mb-16 text-pretty mobile-visible"
           >
             We construct elite partnerships that bridge design obsession and full-stack software engineering. Ingesting active coordinates from our live admin system, we serve as the scaling foundation for forward-thinking global brands.
           </motion.p>
@@ -231,7 +253,7 @@ export default function ClientsPage() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-wrap items-center gap-3 mb-16 relative z-10"
+            className="flex flex-wrap items-center gap-3 mb-16 relative z-10 mobile-visible"
           >
             {SECTOR_FILTERS.map((filter) => {
               const isActive = activeFilter === filter;
@@ -253,7 +275,7 @@ export default function ClientsPage() {
           </motion.div>
 
           {/* Core Minimalist Clients Grid (Matches Homepage Grid Exactly) */}
-          {loading ? (
+          {loading && clientsList.length === 0 ? (
             <div className="w-full py-32 flex items-center justify-center">
               <div className="w-10 h-10 border-2 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
             </div>
@@ -261,7 +283,7 @@ export default function ClientsPage() {
             <motion.div
               initial="hidden"
               whileInView="show"
-              viewport={{ once: true, margin: "-100px" }}
+              viewport={{ once: true, margin: "100px" }}
               variants={{
                 hidden: {},
                 show: {
@@ -276,11 +298,13 @@ export default function ClientsPage() {
                 <motion.div
                   key={client.id || i}
                   variants={{
-                    hidden: { opacity: 0, y: 20, filter: "blur(5px)" },
+                    hidden: isMobile
+                      ? { opacity: 0, y: 12 }
+                      : { opacity: 0, y: 20, filter: "blur(5px)" },
                     show: {
                       opacity: 1,
                       y: 0,
-                      filter: "blur(0px)",
+                      filter: isMobile ? "none" : "blur(0px)",
                       transition: {
                         duration: 0.65,
                         ease: [0.16, 1, 0.3, 1],

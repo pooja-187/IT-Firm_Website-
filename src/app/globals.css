@@ -218,3 +218,11 @@ html.lenis {
   border-color: var(--color-gold);
   box-shadow: 0 0 20px rgba(197, 168, 128, 0.15);
 }
+
+/* Mobile Immediate Content Visibility - prevents content from being held invisible by opacity:0 during initial SSR/hydration */
+@media (max-width: 767px) {
+  .mobile-visible {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
