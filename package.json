@@ -8,8 +8,8 @@
     "dev:backend": "node manzio-backend/server.js",
     "dev:admin": "npm --prefix manzio-admin run dev",
     "build:admin": "npm --prefix manzio-admin run build",
-    "build": "npm --prefix manzio-admin run build && next build && powershell -Command \"Remove-Item -Recurse -Force _next -ErrorAction SilentlyContinue; Copy-Item -Recurse -Force out/_next ./; Copy-Item -Force out/*.html ./; Copy-Item -Recurse -Force out/blog ./ -ErrorAction SilentlyContinue; Copy-Item -Force out/blog.html ./blog/index.html -ErrorAction SilentlyContinue; Copy-Item -Force out/blog.html ./out/blog/index.html -ErrorAction SilentlyContinue\"",
-    "build:all": "npm --prefix manzio-admin run build && next build && powershell -Command \"Remove-Item -Recurse -Force _next -ErrorAction SilentlyContinue; Copy-Item -Recurse -Force out/_next ./; Copy-Item -Force out/*.html ./; Copy-Item -Recurse -Force out/blog ./ -ErrorAction SilentlyContinue; Copy-Item -Force out/blog.html ./blog/index.html -ErrorAction SilentlyContinue; Copy-Item -Force out/blog.html ./out/blog/index.html -ErrorAction SilentlyContinue\"",
+    "build": "npm --prefix manzio-admin run build && next build && node scripts/sync-export.js",
+    "build:all": "npm --prefix manzio-admin run build && next build && node scripts/sync-export.js",
     "start": "node server.js",
     "start:next": "next start",
     "lint": "eslint"

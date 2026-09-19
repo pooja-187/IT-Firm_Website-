@@ -20,6 +20,25 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+const MOCK_BLOGS: Blog[] = [
+  {
+    id: 1,
+    title: "Scaling Modern Web Applications in 2026",
+    date: "2026-05-18",
+    metaDescription: "A comprehensive guide to scaling high-traffic Next.js and Django platforms.",
+    description: "Building high-performance digital ecosystems requires decoupling your frontend and backend. Using Next.js for Server-Side Rendering (SSR) paired with a robust Django REST API on SQLite/PostgreSQL gives developer efficiency and scalability. In this guide, we dive deep into database index tuning, server caching layers (like Redis), CDN distribution strategies, and custom asset pipeline handling that keeps your applications lighting fast globally.",
+    images: []
+  },
+  {
+    id: 2,
+    title: "The Art of Cinematic UI/UX Design",
+    date: "2026-05-12",
+    metaDescription: "Learn how micro-animations and HSL colors elevate modern SaaS dashboards.",
+    description: "Design is not just what it looks like; it's how it feels and flows. Integrating GSAP, smooth CSS gradients, glassmorphism layers, and responsive column feeds creates trust and a premium feel. We explore HSL color tailoring, the psychology behind 3D rotational tilt cards, micro-interactions, and using spring-based motion curves instead of simple linear animations to create software that feels truly premium and alive.",
+    images: []
+  }
+];
+
 export default function BlogDetailsClient() {
   const params = useParams();
   const router = useRouter();
@@ -38,8 +57,18 @@ export default function BlogDetailsClient() {
         setLoading(true);
         setError(null);
 
-        // 1. Fetch all blogs from Django REST
-        const allBlogs = await apiService.getBlogs();
+        // 1. Fetch all blogs from API or fallback
+        let allBlogs: Blog[] = [];
+        try {
+          const fetched = await apiService.getBlogs();
+          if (fetched && fetched.length > 0) {
+            allBlogs = fetched;
+          } else {
+            allBlogs = MOCK_BLOGS;
+          }
+        } catch {
+          allBlogs = MOCK_BLOGS;
+        }
         
         // 2. Find matching blog based on slugified title
         const currentBlog = allBlogs.find((b) => slugify(b.title) === slug);
@@ -57,15 +86,15 @@ export default function BlogDetailsClient() {
         setRelatedBlogs(others);
 
         // 4. Fetch portfolio projects to bind related showcase project dynamically
-        const fetchedProjects = await apiService.getWorks();
-        if (fetchedProjects && fetchedProjects.length > 0) {
-          // Bind first project as showcase or find category match
-          const match = fetchedProjects.find(
-            (p) => p.category.toLowerCase().includes(currentBlog.title.toLowerCase().substring(0, 4))
-          );
-          setRelatedProject(match || fetchedProjects[0]);
-        }
-
+        try {
+          const fetchedProjects = await apiService.getWorks();
+          if (fetchedProjects && fetchedProjects.length > 0) {
+            const match = fetchedProjects.find(
+              (p) => p.category.toLowerCase().includes(currentBlog.title.toLowerCase().substring(0, 4))
+            );
+            setRelatedProject(match || fetchedProjects[0]);
+          }
+        } catch {}
       } catch (err: any) {
         console.error("Failed to load blog details:", err);
         setError("Unable to connect to the Manzio publishing server.");

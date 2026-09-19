@@ -6,7 +6,7 @@ DirectoryIndex index.html index.php
   RewriteEngine On
   RewriteBase /
 
-  # 1. Direct file requests (existing real files e.g. .js, .css, .png, .jpg, .woff2, .html, .ico, .svg)
+  # 1. Direct file requests (matches existing real files e.g. .js, .css, .png, .jpg, .woff2, .html, .ico, .svg, .txt, RSC payloads)
   RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule ^ - [L]
 
@@ -14,28 +14,37 @@ DirectoryIndex index.html index.php
   RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
   RewriteRule ^(.*)$ public/$1 [L]
 
-  # 3. Media routing to backend media folder
+  # 3. API requests -> Reverse-proxy to Node.js/Express backend (port 8000 or 3000)
+  <IfModule mod_proxy.c>
+    RewriteCond %{REQUEST_URI} ^/api(/.*)?$
+    RewriteRule ^api/(.*)$ http://127.0.0.1:8000/api/$1 [P,L]
+    RewriteRule ^api/?$ http://127.0.0.1:8000/api/ [P,L]
+  </IfModule>
+
+  # 4. Media routing to backend media folder
+  RewriteCond %{DOCUMENT_ROOT}/manzio-backend/media/$1 -f
+  RewriteRule ^media/(.*)$ manzio-backend/media/$1 [L]
   RewriteRule ^media/(.*)$ manzio-backend/media/$1 [L]
 
-  # 4. Admin SPA routing: /admin and /admin/* -> public/admin/index.html
+  # 5. Admin SPA routing: /admin and /admin/* -> public/admin/index.html
   RewriteRule ^admin(/.*)?$ public/admin/index.html [L]
 
-  # 5. Blog main listing: /blog and /blog/ -> blog/index.html
-  RewriteRule ^blog/?$ blog/index.html [L]
-
-  # 6. Blog article clean URLs: /blog/slug or /blog/slug/ -> blog/slug.html
+  # 6. Blog article clean URLs: /blog/slug or /blog/slug/ -> blog/slug.html (prioritized before /blog folder)
   RewriteCond %{DOCUMENT_ROOT}/blog/$1.html -f
   RewriteRule ^blog/([^/]+)/?$ blog/$1.html [L]
 
-  # 7. Subfolder index clean URLs: e.g. /folder/ -> folder/index.html
-  RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
-  RewriteRule ^(.*)/?$ $1/index.html [L]
+  # 7. Blog main listing: /blog and /blog/ -> blog/index.html
+  RewriteRule ^blog/?$ blog/index.html [L]
 
-  # 8. Top-level clean URLs: /about -> about.html, /work -> work.html, etc.
+  # 8. Top-level clean URLs: /about -> about.html (or about/index.html), /work -> work.html, etc.
   RewriteCond %{DOCUMENT_ROOT}/$1.html -f
   RewriteRule ^([^/]+)/?$ $1.html [L]
 
-  # 9. Existing directories with index files
+  # 9. Subfolder index clean URLs: e.g. /folder/ -> folder/index.html
+  RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
+  RewriteRule ^(.*)/?$ $1/index.html [L]
+
+  # 10. Existing directories with index files
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteCond %{REQUEST_FILENAME}/index.html -f
   RewriteRule ^ - [L]
@@ -43,3 +52,4 @@ DirectoryIndex index.html index.php
 
 # Custom 404 Error Page
 ErrorDocument 404 /404.html
+
