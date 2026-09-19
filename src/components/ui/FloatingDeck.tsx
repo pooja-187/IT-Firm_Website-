@@ -1,61 +1,87 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, Transition } from "framer-motion";
 import { Phone } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export function FloatingDeck() {
   const pathname = usePathname();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   if (pathname === "/chat") return null;
+
+  const phoneAnimate = isMobile
+    ? undefined
+    : {
+        scale: [1, 1.025, 1],
+        boxShadow: [
+          "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 12px 0px rgba(59,130,246,0.08)",
+          "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 20px 4px rgba(59,130,246,0.22)",
+          "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 12px 0px rgba(59,130,246,0.08)",
+        ],
+        borderColor: [
+          "rgba(255,255,255,0.03)",
+          "rgba(59,130,246,0.2)",
+          "rgba(255,255,255,0.03)",
+        ],
+      };
+
+  const whatsappAnimate = isMobile
+    ? undefined
+    : {
+        scale: [1, 1.025, 1],
+        boxShadow: [
+          "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 12px 0px rgba(34,197,94,0.08)",
+          "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 16px 2px rgba(34,197,94,0.22)",
+          "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 12px 0px rgba(34,197,94,0.08)",
+        ],
+        borderColor: [
+          "rgba(255,255,255,0.03)",
+          "rgba(34,197,94,0.2)",
+          "rgba(255,255,255,0.03)",
+        ],
+      };
+
+  const phoneTransition: Transition | undefined = isMobile
+    ? undefined
+    : {
+        scale: { duration: 3.5, repeat: Infinity, ease: "easeInOut" as const },
+        boxShadow: { duration: 3.5, repeat: Infinity, ease: "easeInOut" as const },
+        borderColor: { duration: 3.5, repeat: Infinity, ease: "easeInOut" as const },
+        default: { type: "spring", stiffness: 400, damping: 25 },
+      };
+
+  const whatsappTransition: Transition | undefined = isMobile
+    ? undefined
+    : {
+        scale: { duration: 4, repeat: Infinity, ease: "easeInOut" as const },
+        boxShadow: { duration: 4, repeat: Infinity, ease: "easeInOut" as const },
+        borderColor: { duration: 4, repeat: Infinity, ease: "easeInOut" as const },
+        default: { type: "spring", stiffness: 400, damping: 25 },
+      };
+
   return (
     <div className="fixed right-4 sm:right-6 bottom-4 sm:bottom-6 flex flex-col gap-3 sm:gap-4 z-50">
       <motion.a
         href="tel:+919495929458"
         aria-label="Call Us"
-        animate={{
-          scale: [1, 1.025, 1],
-          boxShadow: [
-            "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 12px 0px rgba(59,130,246,0.08)",
-            "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 20px 4px rgba(59,130,246,0.22)",
-            "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 12px 0px rgba(59,130,246,0.08)",
-          ],
-          borderColor: [
-            "rgba(255,255,255,0.03)",
-            "rgba(59,130,246,0.2)",
-            "rgba(255,255,255,0.03)"
-          ]
-        }}
+        animate={phoneAnimate}
         whileHover={{
           scale: 1.1,
           boxShadow: "0 12px 40px -8px rgba(0,0,0,0.7), 0 0 25px 6px rgba(59,130,246,0.35)",
           borderColor: "rgba(59,130,246,0.45)",
-          color: "#60a5fa"
+          color: "#60a5fa",
         }}
-        transition={{
-          scale: {
-            duration: 3.5,
-            repeat: Infinity,
-            ease: "easeInOut"
-          },
-          boxShadow: {
-            duration: 3.5,
-            repeat: Infinity,
-            ease: "easeInOut"
-          },
-          borderColor: {
-            duration: 3.5,
-            repeat: Infinity,
-            ease: "easeInOut"
-          },
-          default: {
-            type: "spring",
-            stiffness: 400,
-            damping: 25
-          }
-        }}
-        className="w-9 h-9 sm:w-[46px] sm:h-[46px] flex items-center justify-center rounded-xl bg-black/45 sm:bg-black/60 border border-white/5 text-neutral-400 hover:text-white transition-colors duration-300 shadow-2xl backdrop-blur-md cursor-pointer"
+        transition={phoneTransition}
+        className="w-9 h-9 sm:w-[46px] sm:h-[46px] flex items-center justify-center rounded-xl bg-black/45 sm:bg-black/60 border border-white/5 text-neutral-400 hover:text-white transition-colors duration-300 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.6),0_0_12px_0px_rgba(59,130,246,0.15)] sm:shadow-2xl backdrop-blur-md cursor-pointer"
       >
         <Phone className="w-4 h-4 sm:w-[19px] sm:h-[19px]" />
       </motion.a>
@@ -66,48 +92,15 @@ export function FloatingDeck() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="WhatsApp Chat"
-        animate={{
-          scale: [1, 1.025, 1],
-          boxShadow: [
-            "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 12px 0px rgba(34,197,94,0.08)",
-            "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 16px 2px rgba(34,197,94,0.22)",
-            "0 8px 32px -8px rgba(0,0,0,0.6), 0 0 12px 0px rgba(34,197,94,0.08)",
-          ],
-          borderColor: [
-            "rgba(255,255,255,0.03)",
-            "rgba(34,197,94,0.2)",
-            "rgba(255,255,255,0.03)"
-          ]
-        }}
+        animate={whatsappAnimate}
         whileHover={{
           scale: 1.1,
           boxShadow: "0 12px 40px -8px rgba(0,0,0,0.7), 0 0 25px 6px rgba(34,197,94,0.35)",
           borderColor: "rgba(34,197,94,0.45)",
-          color: "#4ade80"
+          color: "#4ade80",
         }}
-        transition={{
-          scale: {
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut"
-          },
-          boxShadow: {
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut"
-          },
-          borderColor: {
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut"
-          },
-          default: {
-            type: "spring",
-            stiffness: 400,
-            damping: 25
-          }
-        }}
-        className="w-9 h-9 sm:w-[46px] sm:h-[46px] flex items-center justify-center rounded-xl bg-black/45 sm:bg-black/60 border border-white/5 text-neutral-400 hover:text-white transition-colors duration-300 shadow-2xl backdrop-blur-md cursor-pointer"
+        transition={whatsappTransition}
+        className="w-9 h-9 sm:w-[46px] sm:h-[46px] flex items-center justify-center rounded-xl bg-black/45 sm:bg-black/60 border border-white/5 text-neutral-400 hover:text-white transition-colors duration-300 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.6),0_0_12px_0px_rgba(34,197,94,0.15)] sm:shadow-2xl backdrop-blur-md cursor-pointer"
       >
         <svg
           viewBox="0 0 16 16"

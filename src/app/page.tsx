@@ -173,6 +173,18 @@ interface StatsGlowTrailProps {
 }
 
 function StatsGlowTrail({ parentRef, inView }: StatsGlowTrailProps) {
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    const checkTouch = () => {
+      const isTouch =
+        window.matchMedia("(pointer: coarse) and (hover: none)").matches ||
+        window.innerWidth < 768;
+      setIsTouchDevice(isTouch);
+    };
+    checkTouch();
+  }, []);
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -196,7 +208,7 @@ function StatsGlowTrail({ parentRef, inView }: StatsGlowTrailProps) {
   const sparkleIdRef = useRef(0);
 
   useEffect(() => {
-    if (!inView) return; // Completely freeze loop when out of viewport!
+    if (!inView || isTouchDevice) return; // Completely freeze loop when out of viewport or on touch devices!
 
     const parent = parentRef.current;
     const canvas = canvasRef.current;
@@ -374,7 +386,9 @@ function StatsGlowTrail({ parentRef, inView }: StatsGlowTrailProps) {
       if (animFrameId !== null) cancelAnimationFrame(animFrameId);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [parentRef, x, y, scaleX, scaleY, rotate, opacity, inView]);
+  }, [parentRef, x, y, scaleX, scaleY, rotate, opacity, inView, isTouchDevice]);
+
+  if (isTouchDevice) return null;
 
   return (
     <>
@@ -689,7 +703,7 @@ export default function Home() {
     const unsubscribe = servicesStickyScrollYProgress.on("change", (progress) => {
       let index = Math.floor(progress * 5);
       index = Math.min(4, Math.max(0, index));
-      setActiveService(index);
+      setActiveService((prev) => (prev === index ? prev : index));
     });
     return () => unsubscribe();
   }, [servicesStickyScrollYProgress]);

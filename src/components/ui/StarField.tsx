@@ -109,20 +109,36 @@ export function StarField() {
     let smoothScrollVelocity = 0;
     let ambientSpeedMultiplier = 1;
 
-    const handleScroll = () => {
-      currentScrollY = window.scrollY;
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
     // Detect if we are on mobile to scale count and preserve CPU/Battery
     const isMobile = width < 768;
-    const countScale = isMobile ? 0.45 : 1.0;
+    // Scale count to ~27 particles on mobile (25-30 range), 1.0 on desktop
+    const countScale = isMobile ? 0.18 : 1.0;
+
+    let isScrollingMobile = false;
+    let scrollTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const handleScroll = () => {
+      currentScrollY = window.scrollY;
+
+      if (isMobile) {
+        isScrollingMobile = true;
+        if (scrollTimeoutId !== null) {
+          clearTimeout(scrollTimeoutId);
+        }
+        scrollTimeoutId = setTimeout(() => {
+          isScrollingMobile = false;
+          lastScrollY = window.scrollY;
+        }, 120);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     const handleResize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      // Cap DPR to 1.5 to maintain razor-sharp stars while avoiding multi-million pixel fill-rate penalties
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const isMobileNow = width < 768;
+      // Cap DPR to 1 on mobile to avoid fill-rate penalties; up to 1.5 on desktop
+      dpr = isMobileNow ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
 
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
@@ -139,7 +155,7 @@ export function StarField() {
       particles = [];
 
       const generateForLayer = (config: typeof FAR_LAYER_CONFIG) => {
-        const scaledCount = Math.round(config.count * countScale);
+        const scaledCount = Math.max(1, Math.round(config.count * countScale));
         for (let i = 0; i < scaledCount; i++) {
           const size = lerp(config.minSize, config.maxSize, Math.random());
           const baseOpacity = lerp(config.minOpacity, config.maxOpacity, Math.random());
@@ -175,6 +191,12 @@ export function StarField() {
     // Main animation render loop (highly-optimized RAF with zero shadowBlur CPU penalties)
     const render = () => {
       if (!isRunning) return;
+
+      // On mobile, pause canvas clear/redraw during active touch scrolling to keep 100% of GPU free
+      if (isMobile && isScrollingMobile) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
 
       ctx.clearRect(0, 0, width, height);
 
@@ -270,6 +292,9 @@ export function StarField() {
     // Clean up
     return () => {
       stopLoop();
+      if (scrollTimeoutId !== null) {
+        clearTimeout(scrollTimeoutId);
+      }
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("visibilitychange", handleVisibilityChange);

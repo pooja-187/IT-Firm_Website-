@@ -57,9 +57,19 @@ export default function RootLayout({
 
         {/* FULL-VIEWPORT ATMOSPHERIC BACKGROUND — fixed, spans edge-to-edge regardless of container width */}
         <div className="fixed inset-0 pointer-events-none select-none" style={{ zIndex: 0 }}>
-          {/* Left glow: purple, bottom-left corner */}
+          {/* Left glow: purple, bottom-left corner — Mobile: zero-blur radial gradient; Desktop: original styling */}
           <div
-            className="absolute rounded-full"
+            className="block md:hidden absolute pointer-events-none"
+            style={{
+              width: '100vw',
+              height: '100vh',
+              left: '-20vw',
+              bottom: '-30vh',
+              background: 'radial-gradient(circle at center, rgba(124, 58, 237, 0.18) 0%, rgba(124, 58, 237, 0.08) 40%, transparent 70%)',
+            }}
+          />
+          <div
+            className="hidden md:block absolute rounded-full"
             style={{
               width: '1400px',
               height: '1400px',
@@ -70,9 +80,19 @@ export default function RootLayout({
               filter: 'blur(320px)',
             }}
           />
-          {/* Right glow: deep pink, bottom-right corner */}
+          {/* Right glow: deep pink, bottom-right corner — Mobile: zero-blur radial gradient; Desktop: original styling */}
           <div
-            className="absolute rounded-full"
+            className="block md:hidden absolute pointer-events-none"
+            style={{
+              width: '100vw',
+              height: '100vh',
+              right: '-20vw',
+              bottom: '-30vh',
+              background: 'radial-gradient(circle at center, rgba(190, 24, 93, 0.14) 0%, rgba(190, 24, 93, 0.06) 40%, transparent 70%)',
+            }}
+          />
+          <div
+            className="hidden md:block absolute rounded-full"
             style={{
               width: '1500px',
               height: '1500px',

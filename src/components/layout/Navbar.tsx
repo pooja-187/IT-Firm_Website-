@@ -128,6 +128,46 @@ export function Navbar() {
     open: { opacity: 1, x: 0 },
   } as const;
 
+  const navStyle = isMobile
+    ? {
+        width: "95%",
+        paddingTop: "10px",
+        paddingBottom: "10px",
+        paddingLeft: "16px",
+        paddingRight: "16px",
+        background: `linear-gradient(
+          90deg,
+          rgba(8,8,10,0.92) 0%,
+          rgba(30,30,35,0.82) 35%,
+          rgba(55,35,85,0.18) 50%,
+          rgba(30,30,35,0.82) 65%,
+          rgba(8,8,10,0.92) 100%
+        )`,
+        border: "1px solid rgba(180,120,255,0.12)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        boxShadow: "0 16px 40px -15px rgba(139,92,246,0.15), 0 20px 50px rgba(0,0,0,0.7)",
+      }
+    : {
+        width,
+        paddingTop: py,
+        paddingBottom: py,
+        paddingLeft: px,
+        paddingRight: px,
+        background: `linear-gradient(
+          90deg,
+          rgba(8,8,10,0.92) 0%,
+          rgba(30,30,35,0.82) 35%,
+          rgba(55,35,85,0.18) 50%,
+          rgba(30,30,35,0.82) 65%,
+          rgba(8,8,10,0.92) 100%
+        )`,
+        border,
+        backdropFilter,
+        WebkitBackdropFilter: backdropFilter,
+        boxShadow,
+      };
+
   if (pathname === "/chat") return null;
 
   return (
@@ -141,32 +181,14 @@ export function Navbar() {
         {/* Main Floating Navbar Pill */}
         <motion.nav
           className="rounded-full flex items-center justify-between relative"
-          style={{
-            width,
-            paddingTop: py,
-            paddingBottom: py,
-            paddingLeft: px,
-            paddingRight: px,
-            background: `linear-gradient(
-              90deg,
-              rgba(8,8,10,0.92) 0%,
-              rgba(30,30,35,0.82) 35%,
-              rgba(55,35,85,0.18) 50%,
-              rgba(30,30,35,0.82) 65%,
-              rgba(8,8,10,0.92) 100%
-            )`,
-            border,
-            backdropFilter,
-            WebkitBackdropFilter: backdropFilter,
-            boxShadow,
-          }}
+          style={navStyle}
         >
           {/* Subtle glow layer behind the pill */}
           <div className="absolute inset-0 rounded-full opacity-40 blur-xl pointer-events-none transition-all duration-500 -z-10 bg-gradient-to-r from-brand-purple/0 via-brand-pink/5 to-brand-purple/0 group-hover:via-brand-pink/10" />
 
           {/* Left: Brand Logo */}
           <motion.div
-            style={{ scale: logoScale, originX: 0 }}
+            style={{ scale: isMobile ? 1 : logoScale, originX: 0 }}
             className="flex items-center z-10 w-[140px] md:w-[160px]"
           >
             <Link
@@ -177,9 +199,9 @@ export function Navbar() {
               {/* Full Branding Logo */}
               <motion.div
                 style={{
-                  opacity: fullLogoOpacity,
-                  scale: fullLogoScale,
-                  filter: fullLogoFilter,
+                  opacity: isMobile ? 1 : fullLogoOpacity,
+                  scale: isMobile ? 1 : fullLogoScale,
+                  filter: isMobile ? "none" : fullLogoFilter,
                 }}
                 className="absolute left-0 top-1/2 -translate-y-1/2 origin-left flex items-center pointer-events-none"
               >
@@ -198,9 +220,9 @@ export function Navbar() {
               {/* Minimal Monogram Logo */}
               <motion.div
                 style={{
-                  opacity: monoLogoOpacity,
-                  scale: monoLogoScale,
-                  filter: monoLogoFilter,
+                  opacity: isMobile ? 0 : monoLogoOpacity,
+                  scale: isMobile ? 1 : monoLogoScale,
+                  filter: isMobile ? "none" : monoLogoFilter,
                 }}
                 className="absolute left-0 top-1/2 -translate-y-1/2 origin-left flex items-center pointer-events-none"
               >

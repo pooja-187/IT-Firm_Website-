@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { motion, useScroll, useTransform, useMotionTemplate } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionTemplate, useInView } from "framer-motion";
 import { ArrowUpRight, ShieldCheck, Landmark, Compass, Palette, Smile, Code2 } from "lucide-react";
 import Image from "next/image";
 import { apiService } from "@/utils/api";
@@ -372,6 +372,7 @@ export function ProjectShowcase() {
   const [isHovered, setIsHovered] = useState(false);
   const [containerMousePos, setContainerMousePos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLElement>(null);
+  const isInView = useInView(containerRef, { margin: "200px 0px" });
   const [projectsList, setProjectsList] = useState<Project[]>(PROJECTS);
 
   useEffect(() => {
@@ -565,9 +566,9 @@ export function ProjectShowcase() {
                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
             <div className="relative h-full overflow-hidden flex flex-col w-full">
               <motion.div
-                animate={{
+                animate={isInView ? {
                   y: ["0%", "-50%"],
-                }}
+                } : undefined}
                 transition={{
                   ease: "linear",
                   duration: isHovered ? 52 : 36, // Smoothly slows down scroll on showcase hover
@@ -588,9 +589,9 @@ export function ProjectShowcase() {
                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
             <div className="relative h-full overflow-hidden hidden md:flex flex-col w-full">
               <motion.div
-                animate={{
+                animate={isInView ? {
                   y: ["-50%", "0%"],
-                }}
+                } : undefined}
                 transition={{
                   ease: "linear",
                   duration: isHovered ? 52 : 36, // Smoothly slows down scroll on showcase hover

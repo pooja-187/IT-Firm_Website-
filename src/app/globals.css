@@ -96,7 +96,6 @@ body {
 }
 
 /* Promote page-level motion wrapper to GPU compositor immediately */
-[data-framer-component-type],
 .framer-motion-page {
   will-change: opacity, transform;
   backface-visibility: hidden;
