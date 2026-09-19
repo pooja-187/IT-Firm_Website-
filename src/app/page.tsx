@@ -178,7 +178,9 @@ function StatsGlowTrail({ parentRef, inView }: StatsGlowTrailProps) {
   useEffect(() => {
     const checkTouch = () => {
       const isTouch =
-        window.matchMedia("(pointer: coarse) and (hover: none)").matches ||
+        (typeof window !== "undefined" &&
+          (window.matchMedia("(pointer: coarse)").matches ||
+           ("ontouchstart" in window || navigator.maxTouchPoints > 0))) ||
         window.innerWidth < 768;
       setIsTouchDevice(isTouch);
     };
@@ -522,12 +524,43 @@ export default function Home() {
   const [services, setServices] = useState(SERVICES);
   const [clients, setClients] = useState<any[]>(CLIENTS.map((c, idx) => ({ id: idx, name: c })));
   const [isMobile, setIsMobile] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
+    const check = () => {
+      const isTouch =
+        (typeof window !== "undefined" &&
+          (window.matchMedia("(pointer: coarse)").matches ||
+           ("ontouchstart" in window || navigator.maxTouchPoints > 0))) ||
+        window.innerWidth < 768;
+      setIsTouchDevice(isTouch);
+      setIsMobile(window.innerWidth < 768);
+    };
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Track active scrolling using a ref (zero React state updates on scroll, no root re-renders)
+  const isUserScrollingRef = useRef(false);
+  const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      isUserScrollingRef.current = true;
+      if (scrollEndTimerRef.current !== null) {
+        clearTimeout(scrollEndTimerRef.current);
+      }
+      scrollEndTimerRef.current = setTimeout(() => {
+        isUserScrollingRef.current = false;
+      }, 200);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -588,6 +621,11 @@ export default function Home() {
 
     const tick = () => {
       if (document.hidden) return;
+      // On touch devices, pause autoplay step transition while the user is actively scrolling
+      if (isUserScrollingRef.current) {
+        timeoutId = setTimeout(tick, 400);
+        return;
+      }
       setActiveStep((prev) => {
         const nextStep = prev === null ? 0 : (prev + 1) % 5;
         return nextStep;
@@ -1159,7 +1197,7 @@ export default function Home() {
                     {/* Autoplay Soft Ambient Card Bloom (flows horizontally between steps) */}
                     {isActive && !isAnyCardHovered && (
                       <motion.div
-                        layoutId="activeCardBloom"
+                        layoutId={isTouchDevice ? undefined : "activeCardBloom"}
                         className="absolute inset-[-30px] pointer-events-none -z-20 rounded-md"
                         style={{
                           background: "radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.2) 0%, transparent 70%)",
@@ -1294,7 +1332,7 @@ export default function Home() {
                           {/* Active Dot underneath/above the tick */}
                           {isHighlighted && (
                             <motion.div 
-                              layoutId="activeOutcomeDot"
+                              layoutId={isTouchDevice ? undefined : "activeOutcomeDot"}
                               className="absolute w-2 h-2 rounded-full bg-brand-purple border border-black shadow-[0_0_8px_rgba(139,92,246,0.6)] z-20"
                               style={{ top: '3px' }}
                               transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -1431,19 +1469,32 @@ export default function Home() {
             }}
           />
 
-          {/* ── Dark purple cinematic ambient glow — breathes slowly behind text */}
+          {/* ── Dark purple cinematic ambient glow — breathes slowly behind text on desktop, static feathered gradient on touch/mobile */}
           <motion.div
             className="absolute pointer-events-none select-none"
-            style={{ zIndex: 4 }}
-            animate={{
-              // Slow organic breathing: scale 1.0 → 1.18 → 1.0
-              scale:   [1, 1.18, 1.05, 1.18, 1],
-              // Gentle positional drift: floats slightly in a loop
-              x:       [0, 18, -12, 22, 0],
-              y:       [0, -14, 20, -8, 0],
-              // Very subtle opacity breathing
-              opacity: [0.9, 1, 0.85, 1, 0.9],
+            style={{
+              zIndex: 4,
+              ...(isTouchDevice
+                ? {
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                  }
+                : {}),
             }}
+            animate={
+              isTouchDevice
+                ? undefined
+                : {
+                    // Slow organic breathing: scale 1.0 → 1.18 → 1.0
+                    scale: [1, 1.18, 1.05, 1.18, 1],
+                    // Gentle positional drift: floats slightly in a loop
+                    x: [0, 18, -12, 22, 0],
+                    y: [0, -14, 20, -8, 0],
+                    // Very subtle opacity breathing
+                    opacity: [0.9, 1, 0.85, 1, 0.9],
+                  }
+            }
             transition={{
               duration: 18,
               ease: "easeInOut",
@@ -1454,15 +1505,17 @@ export default function Home() {
             {/* Inner glow blob */}
             <div
               style={{
-                width: "680px",
-                height: "480px",
+                width: isTouchDevice ? "380px" : "680px",
+                height: isTouchDevice ? "280px" : "480px",
                 borderRadius: "50%",
-                background: "radial-gradient(ellipse at 50% 50%, rgba(91,46,255,0.13) 0%, rgba(122,92,255,0.07) 38%, rgba(155,109,255,0.03) 62%, transparent 80%)",
-                filter: "blur(48px)",
-                transform: "translate(-50%, -50%)",
-                position: "absolute",
-                top: "50%",
-                left: "50%",
+                background: isTouchDevice
+                  ? "radial-gradient(ellipse at 50% 50%, rgba(124,58,237,0.18) 0%, rgba(91,46,255,0.10) 25%, rgba(122,92,255,0.04) 50%, rgba(155,109,255,0.01) 75%, transparent 88%)"
+                  : "radial-gradient(ellipse at 50% 50%, rgba(91,46,255,0.13) 0%, rgba(122,92,255,0.07) 38%, rgba(155,109,255,0.03) 62%, transparent 80%)",
+                filter: isTouchDevice ? "none" : "blur(48px)",
+                transform: isTouchDevice ? undefined : "translate(-50%, -50%)",
+                position: isTouchDevice ? "relative" : "absolute",
+                top: isTouchDevice ? undefined : "50%",
+                left: isTouchDevice ? undefined : "50%",
               }}
             />
           </motion.div>
@@ -1567,7 +1620,7 @@ export default function Home() {
           Staggered fade-up entry · rounded glassmorphism cards · subtle hover glows
           ═══════════════════════════════════════════════════════ */}
       <section ref={clientsRef} id="clients" className="relative w-full pt-10 pb-28 sm:pt-14 sm:pb-36 bg-black z-30 overflow-hidden">
-        <motion.div style={{ opacity: clientsOpacity, filter: isMobile ? "none" : clientsBlur }} className="w-full">
+        <motion.div style={{ opacity: clientsOpacity, filter: (isMobile || isTouchDevice) ? "none" : clientsBlur }} className="w-full">
 
         <div className="relative w-full max-w-6xl mx-auto px-6 z-10 text-center">
           {/* Subtle Top Label */}

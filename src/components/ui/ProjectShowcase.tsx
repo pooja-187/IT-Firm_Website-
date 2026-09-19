@@ -319,7 +319,7 @@ function ProjectCard({ project }: ProjectCardProps) {
         />
 
         {/* Outer Card Body */}
-        <div className="relative w-full h-full rounded-[15px] bg-[#09090b]/80 border border-white/5 backdrop-blur-xl overflow-hidden flex flex-col justify-between p-5 z-10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] transition-all duration-500">
+        <div className="relative w-full h-full rounded-[15px] bg-[#09090b]/92 md:bg-[#09090b]/80 border border-white/5 md:backdrop-blur-xl showcase-card overflow-hidden flex flex-col justify-between p-5 z-10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] transition-all duration-500">
           
           {/* Dynamic Card Internal Radial Glow Spotlight */}
           <div
@@ -544,7 +544,7 @@ export function ProjectShowcase() {
           />
 
           {/* 3. Inner Panel Body (Layered on top of borders) */}
-          <div className="relative w-full rounded-[2.42rem] p-1.5 md:p-2.5 overflow-hidden bg-[#060608]/92 backdrop-blur-2xl z-10 flex flex-col justify-between">
+          <div className="relative w-full rounded-[2.42rem] p-1.5 md:p-2.5 overflow-hidden bg-[#060608]/96 md:bg-[#060608]/92 md:backdrop-blur-2xl showcase-panel z-10 flex flex-col justify-between">
             
             {/* Ambient Internal spotlight reflection inside the panel glass */}
             <div 
@@ -575,6 +575,7 @@ export function ProjectShowcase() {
                   repeat: Infinity,
                 }}
                 className="flex flex-col gap-6"
+                style={{ willChange: "transform" }}
               >
                 {leftLoop.map((project, i) => (
                   <ProjectCard key={`left-${project.id}-${i}`} project={project} />
@@ -598,6 +599,7 @@ export function ProjectShowcase() {
                   repeat: Infinity,
                 }}
                 className="flex flex-col gap-6"
+                style={{ willChange: "transform" }}
               >
                 {rightLoop.map((project, i) => (
                   <ProjectCard key={`right-${project.id}-${i}`} project={project} />

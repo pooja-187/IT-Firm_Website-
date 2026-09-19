@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, useScroll, useTransform, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
 import { X, Check, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -40,8 +40,18 @@ function WhyChoosePanel({ title, isPremium, bullets, accentColor, glowColor, ind
   const cardRef = useRef<HTMLDivElement>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
-  // Motion values for 3D Parallax Tilt
+  useEffect(() => {
+    const isTouch =
+      (typeof window !== "undefined" &&
+        (window.matchMedia("(pointer: coarse)").matches ||
+         ("ontouchstart" in window || navigator.maxTouchPoints > 0))) ||
+      window.innerWidth < 768;
+    setIsTouchDevice(isTouch);
+  }, []);
+
+  // Motion values for 3D Parallax Tilt (desktop only)
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
@@ -50,6 +60,8 @@ function WhyChoosePanel({ title, isPremium, bullets, accentColor, glowColor, ind
   const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-6, 6]), { stiffness: 120, damping: 20 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Disable pointer-based 3D tilt on touch devices
+    if (isTouchDevice) return;
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     
@@ -89,9 +101,9 @@ function WhyChoosePanel({ title, isPremium, bullets, accentColor, glowColor, ind
       viewport={{ once: true, margin: "100px" }}
       transition={{ duration: 0.8, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
       style={{
-        rotateX,
-        rotateY,
-        transformStyle: "preserve-3d",
+        rotateX: isTouchDevice ? 0 : rotateX,
+        rotateY: isTouchDevice ? 0 : rotateY,
+        transformStyle: isTouchDevice ? undefined : "preserve-3d",
       }}
       className={`group relative w-full rounded-[2.2rem] p-[1.2px] overflow-hidden transition-all duration-[600ms] ease-out select-none ${
         isPremium 
@@ -194,9 +206,9 @@ function WhyChoosePanel({ title, isPremium, bullets, accentColor, glowColor, ind
 
       {/* 7. Card Body Container */}
       <div 
-        style={{ transform: "translateZ(10px)" }}
-        className={`relative w-full h-full rounded-[2.1rem] px-8 py-10 overflow-hidden backdrop-blur-2xl z-10 flex flex-col justify-between shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] transition-all duration-500 ${
-          isPremium ? "bg-[#09090b]/85" : "bg-[#060608]/75"
+        style={{ transform: isTouchDevice ? undefined : "translateZ(10px)" }}
+        className={`relative w-full h-full rounded-[2.1rem] px-8 py-10 overflow-hidden md:backdrop-blur-2xl why-choose-card-body z-10 flex flex-col justify-between shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] transition-all duration-500 ${
+          isPremium ? "bg-[#09090b]/95 md:bg-[#09090b]/85" : "bg-[#060608]/95 md:bg-[#060608]/75"
         }`}
       >
         {/* Subtle internal glass gloss reflection highlight */}

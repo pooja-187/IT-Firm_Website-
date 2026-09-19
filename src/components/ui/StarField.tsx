@@ -109,29 +109,42 @@ export function StarField() {
     let smoothScrollVelocity = 0;
     let ambientSpeedMultiplier = 1;
 
-    // Detect if we are on mobile to scale count and preserve CPU/Battery
-    const isMobile = width < 768;
-    // Scale count to ~27 particles on mobile (25-30 range), 1.0 on desktop
-    const countScale = isMobile ? 0.18 : 1.0;
+    // Robust touch/coarse-pointer detection for Android and mobile touch devices
+    const isTouchDevice =
+      typeof window !== "undefined" &&
+      (window.matchMedia("(pointer: coarse)").matches ||
+       ("ontouchstart" in window || navigator.maxTouchPoints > 0) ||
+       width < 768);
 
-    let isScrollingMobile = false;
+    // Scale count to ~27 particles on touch/mobile (25-30 range), 1.0 on desktop
+    const countScale = isTouchDevice ? 0.18 : 1.0;
+
+    let isTouchScrolling = false;
     let scrollTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
     const handleScroll = () => {
       currentScrollY = window.scrollY;
 
-      if (isMobile) {
-        isScrollingMobile = true;
+      if (isTouchDevice) {
+        if (!isTouchScrolling) {
+          isTouchScrolling = true;
+          // Immediately cancel the active requestAnimationFrame loop to give 100% CPU/GPU to touch scrolling
+          if (animationFrameId !== null) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+          }
+        }
         if (scrollTimeoutId !== null) {
           clearTimeout(scrollTimeoutId);
         }
+        // Resume the StarField animation ~150ms after scrolling stops
         scrollTimeoutId = setTimeout(() => {
-          isScrollingMobile = false;
+          isTouchScrolling = false;
           lastScrollY = window.scrollY;
           if (isRunning && animationFrameId === null) {
             animationFrameId = requestAnimationFrame(render);
           }
-        }, 120);
+        }, 150);
       }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -139,9 +152,14 @@ export function StarField() {
     const handleResize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      const isMobileNow = width < 768;
-      // Cap DPR to 1 on mobile to avoid fill-rate penalties; up to 1.5 on desktop
-      dpr = isMobileNow ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+      const isTouchNow =
+        typeof window !== "undefined" &&
+        (window.matchMedia("(pointer: coarse)").matches ||
+         ("ontouchstart" in window || navigator.maxTouchPoints > 0) ||
+         width < 768);
+
+      // Cap DPR to 1 on Android/touch devices to avoid fill-rate penalties; up to 1.5 on desktop
+      dpr = isTouchNow ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
 
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
@@ -195,8 +213,8 @@ export function StarField() {
     const render = () => {
       if (!isRunning) return;
 
-      // On mobile, pause canvas clear/redraw during active touch scrolling to keep 100% of GPU free
-      if (isMobile && isScrollingMobile) {
+      // On Android/touch devices, pause canvas clear/redraw during active touch scrolling to keep 100% of GPU free
+      if (isTouchDevice && isTouchScrolling) {
         animationFrameId = null;
         return;
       }

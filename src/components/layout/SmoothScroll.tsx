@@ -15,9 +15,9 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
   useEffect(() => {
     // Determine if the current device is touch-primary / mobile
     const isTouchOnly =
-      window.matchMedia("(pointer: coarse) and (hover: none)").matches ||
+      window.matchMedia("(pointer: coarse)").matches ||
       (("ontouchstart" in window || navigator.maxTouchPoints > 0) &&
-        window.innerWidth < 1024);
+        (window.innerWidth < 1024 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)));
 
     // Scroll to top on refresh only on desktop where Lenis manages scroll
     if (!isTouchOnly) {
