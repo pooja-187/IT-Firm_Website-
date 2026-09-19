@@ -88,7 +88,7 @@ body {
   font-family: var(--font-sans);
   margin: 0;
   padding: 0;
-  overflow-x: clip;
+  width: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* Prevent FOUC — keep background solid while JS hydrates */

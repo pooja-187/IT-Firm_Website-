@@ -13,14 +13,16 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Scroll to top on refresh
-    window.history.scrollRestoration = "manual";
-
     // Determine if the current device is touch-primary / mobile
     const isTouchOnly =
       window.matchMedia("(pointer: coarse) and (hover: none)").matches ||
       (("ontouchstart" in window || navigator.maxTouchPoints > 0) &&
         window.innerWidth < 1024);
+
+    // Scroll to top on refresh only on desktop where Lenis manages scroll
+    if (!isTouchOnly) {
+      window.history.scrollRestoration = "manual";
+    }
 
     let rafId: number | null = null;
     let lenis: Lenis | null = null;
@@ -55,16 +57,11 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
       if (lenisRef.current) {
         lenisRef.current.scrollTo(element, { offset: -20, duration });
       } else {
-        const top =
-          element.getBoundingClientRect().top + window.scrollY - 20;
-        window.scrollTo({
-          top,
-          behavior: "smooth",
-        });
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     };
 
-    // Intercept anchor clicks for same-page smooth scroll
+    // Intercept anchor clicks for same-page smooth scroll on desktop only
     const handleAnchorClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest("a");
@@ -96,14 +93,18 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
       }
     };
 
-    document.addEventListener("click", handleAnchorClick, { passive: false });
+    if (!isTouchOnly) {
+      document.addEventListener("click", handleAnchorClick, { passive: false });
+    }
 
     // Clean up on component unmount
     return () => {
       if (rafId !== null) {
         cancelAnimationFrame(rafId);
       }
-      document.removeEventListener("click", handleAnchorClick);
+      if (!isTouchOnly) {
+        document.removeEventListener("click", handleAnchorClick);
+      }
       if (lenis) {
         lenis.destroy();
         lenisRef.current = null;
@@ -127,12 +128,7 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
               duration: 1.8,
             });
           } else {
-            const top =
-              targetElement.getBoundingClientRect().top + window.scrollY - 20;
-            window.scrollTo({
-              top,
-              behavior: "smooth",
-            });
+            targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
           }
         }
       }, 400);

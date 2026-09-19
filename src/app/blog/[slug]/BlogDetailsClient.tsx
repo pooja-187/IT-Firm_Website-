@@ -289,7 +289,7 @@ export default function BlogDetailsClient() {
                   key={idx}
                   initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
+                  viewport={{ once: true, margin: "100px" }}
                   transition={{ duration: 0.8, delay: 0.05 * (idx % 3), ease: [0.16, 1, 0.3, 1] }}
                   className="text-white/60 font-normal text-base sm:text-[17px] leading-[1.8] sm:leading-[1.9] mb-8 tracking-wide font-sans text-pretty hover:text-white/85 transition-colors duration-500"
                 >

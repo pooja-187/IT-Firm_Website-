@@ -161,7 +161,7 @@ export function BlogSection() {
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
+            viewport={{ once: true, margin: "100px" }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center gap-2"
           >
@@ -176,7 +176,7 @@ export function BlogSection() {
           <motion.h2
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
+            viewport={{ once: true, margin: "100px" }}
             transition={{ duration: 0.8, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
             className="text-white text-center leading-[1.2] tracking-tight font-semibold max-w-3xl text-pretty mt-1"
             style={{
@@ -195,7 +195,7 @@ export function BlogSection() {
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
+            viewport={{ once: true, margin: "100px" }}
             transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             className="text-white/50 text-[13px] sm:text-[15px] leading-[1.6] max-w-lg font-normal tracking-wide mt-1"
           >
@@ -215,7 +215,7 @@ export function BlogSection() {
             onMouseLeave={() => setIsPaused(false)}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
+            viewport={{ once: true, margin: "100px" }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="group relative w-full rounded-[2.5rem] p-[1.5px] overflow-hidden transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] bg-white/[0.04] hover:bg-transparent cursor-pointer shadow-[0_24px_80px_-15px_rgba(0,0,0,0.85)] hover:shadow-[0_28px_90px_-10px_rgba(139,92,246,0.22)]"
           >

@@ -143,7 +143,7 @@ const CLIENTS = [
 
 function AnimatedNumber({ value, delayIndex }: { value: number; delayIndex: number }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const inView = useInView(ref, { once: true, margin: "50px" });
 
   useEffect(() => {
     if (inView) {
@@ -442,11 +442,10 @@ function ClientCard({ client }: { client: any }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       variants={{
-        hidden: { opacity: 0, y: 25, filter: "blur(6px)" },
+        hidden: { opacity: 0, y: 25 },
         show: {
           opacity: 1,
           y: 0,
-          filter: "blur(0px)",
           transition: {
             duration: 0.7,
             ease: [0.16, 1, 0.3, 1],
@@ -522,6 +521,14 @@ export default function Home() {
   const [stats, setStats] = useState(STATS);
   const [services, setServices] = useState(SERVICES);
   const [clients, setClients] = useState<any[]>(CLIENTS.map((c, idx) => ({ id: idx, name: c })));
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -877,7 +884,7 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
+              viewport={{ once: true, margin: "100px" }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-col items-center gap-2"
             >
@@ -892,7 +899,7 @@ export default function Home() {
             <motion.h2
               initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
+              viewport={{ once: true, margin: "100px" }}
               transition={{ duration: 0.8, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
               className="text-white text-center leading-[1.2] tracking-tight font-semibold max-w-3xl text-pretty mt-1"
               style={{
@@ -911,7 +918,7 @@ export default function Home() {
             <motion.p
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
+              viewport={{ once: true, margin: "100px" }}
               transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
               className="text-white/50 text-[13px] sm:text-[15px] leading-[1.6] max-w-lg font-normal tracking-wide mt-1"
             >
@@ -922,7 +929,7 @@ export default function Home() {
           <motion.div
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: "100px" }}
             variants={{
               hidden: {},
               show: {
@@ -1062,7 +1069,7 @@ export default function Home() {
             onMouseLeave={() => setIsProcessHovered(false)}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once: true, margin: "100px" }}
             transition={{ type: "spring", stiffness: 45, damping: 15 }}
             className="w-full max-w-[1100px] mx-auto rounded-xl border border-white/10 bg-neutral-950/40 p-6 sm:p-8 backdrop-blur-2xl relative z-20 group overflow-hidden select-none shadow-[0_0_60px_-15px_rgba(139,92,246,0.14)]"
             style={{
@@ -1560,14 +1567,14 @@ export default function Home() {
           Staggered fade-up entry · rounded glassmorphism cards · subtle hover glows
           ═══════════════════════════════════════════════════════ */}
       <section ref={clientsRef} id="clients" className="relative w-full pt-10 pb-28 sm:pt-14 sm:pb-36 bg-black z-30 overflow-hidden">
-        <motion.div style={{ opacity: clientsOpacity, filter: clientsBlur }} className="w-full">
+        <motion.div style={{ opacity: clientsOpacity, filter: isMobile ? "none" : clientsBlur }} className="w-full">
 
         <div className="relative w-full max-w-6xl mx-auto px-6 z-10 text-center">
           {/* Subtle Top Label */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
+            viewport={{ once: true, margin: "100px" }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="mb-6"
           >
@@ -1583,7 +1590,7 @@ export default function Home() {
           <motion.h2
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
+            viewport={{ once: true, margin: "100px" }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="text-white text-center leading-[1.25] md:leading-[1.18] font-semibold max-w-4xl mx-auto mb-20 tracking-tight text-pretty"
             style={{
@@ -1602,7 +1609,7 @@ export default function Home() {
           <motion.div
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: "100px" }}
             variants={{
               hidden: {},
               show: {
@@ -1622,7 +1629,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
+            viewport={{ once: true, margin: "100px" }}
             transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="mt-14 relative z-20 flex justify-center"
           >

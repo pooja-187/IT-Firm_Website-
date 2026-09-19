@@ -128,6 +128,9 @@ export function StarField() {
         scrollTimeoutId = setTimeout(() => {
           isScrollingMobile = false;
           lastScrollY = window.scrollY;
+          if (isRunning && animationFrameId === null) {
+            animationFrameId = requestAnimationFrame(render);
+          }
         }, 120);
       }
     };
@@ -194,7 +197,7 @@ export function StarField() {
 
       // On mobile, pause canvas clear/redraw during active touch scrolling to keep 100% of GPU free
       if (isMobile && isScrollingMobile) {
-        animationFrameId = requestAnimationFrame(render);
+        animationFrameId = null;
         return;
       }
 

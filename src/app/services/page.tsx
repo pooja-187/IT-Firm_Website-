@@ -105,7 +105,7 @@ export default function ServicesPage() {
         <motion.span
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
+          viewport={{ once: true, margin: "100px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-[10px] font-semibold uppercase tracking-[0.3em] text-purple-400 mb-5 block"
         >
@@ -115,7 +115,7 @@ export default function ServicesPage() {
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
+          viewport={{ once: true, margin: "100px" }}
           transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           className="text-white text-5xl sm:text-6xl md:text-7xl tracking-tight font-bold mb-10"
           style={{ fontFamily: "Satoshi, sans-serif" }}
@@ -129,7 +129,7 @@ export default function ServicesPage() {
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
+          viewport={{ once: true, margin: "100px" }}
           transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           <Link
