@@ -6,7 +6,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { AppContainer } from "@/components/ui/AppContainer";
-import { ContainerScroll } from "@/components/ui/container-scroll-animation";
 import { ImageAutoSlider } from "@/components/ui/image-auto-slider";
 import { apiService } from "@/utils/api";
 import { cn } from "@/utils/cn";
@@ -426,45 +425,6 @@ export default function WorkPage() {
     ? projects
     : projects.filter(p => p.category === activeFilter);
 
-  // Dynamic Interleaving Logic: Featured (1) -> Normal (2) -> Featured (1) -> Normal (2)...
-  const featuredList = filteredProjects.filter(p => p.featured);
-  const normalList = filteredProjects.filter(p => !p.featured);
-
-  const interleavedProjects: { project: ProjectItem; isFeaturedSection: boolean }[] = [];
-  let featIdx = 0;
-  let normIdx = 0;
-
-  while (featIdx < featuredList.length || normIdx < normalList.length) {
-    if (featIdx < featuredList.length) {
-      interleavedProjects.push({
-        project: featuredList[featIdx],
-        isFeaturedSection: true
-      });
-      featIdx++;
-    }
-
-    let normalAdded = 0;
-    while (normalAdded < 2 && normIdx < normalList.length) {
-      interleavedProjects.push({
-        project: normalList[normIdx],
-        isFeaturedSection: false
-      });
-      normIdx++;
-      normalAdded++;
-    }
-
-    // If no more featured, append remaining normal projects
-    if (featIdx >= featuredList.length && normIdx < normalList.length) {
-      while (normIdx < normalList.length) {
-        interleavedProjects.push({
-          project: normalList[normIdx],
-          isFeaturedSection: false
-        });
-        normIdx++;
-      }
-    }
-  }
-
   return (
     <div
       ref={pageContainerRef}
@@ -552,63 +512,53 @@ export default function WorkPage() {
             <span className="text-white/60">Work</span>
           </motion.div>
 
-          {/* Container Scroll Animation with Admin Dashboard Image */}
-          <ContainerScroll
-            titleComponent={
-              <div className="flex flex-col items-center">
-                {/* Micro Top Label */}
-                <motion.span
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-[11px] font-semibold uppercase tracking-[0.3em] text-purple-400 font-sans block mb-4 mobile-visible"
-                >
-                  Selected Work
-                </motion.span>
+          {/* Clean Header Section */}
+          <div className="flex flex-col items-center text-center mb-10 sm:mb-14 pt-4 md:pt-8">
+            {/* Micro Top Label */}
+            <motion.span
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+              className="text-[11px] font-semibold uppercase tracking-[0.3em] text-purple-400 font-sans block mb-4 mobile-visible"
+            >
+              Selected Work
+            </motion.span>
 
-                {/* Giant Header Heading */}
-                <motion.h1
-                  initial={{ opacity: 0, y: 25 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-white leading-[1.15] tracking-tight max-w-none mb-8 text-center mobile-visible"
-                  style={{
-                    fontFamily: "Satoshi, sans-serif",
-                    fontSize: "clamp(34px, 5.5vw, 68px)",
-                    fontWeight: 700,
-                  }}
-                >
-                  Stories We{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 font-bold drop-shadow-[0_0_15px_rgba(168,85,247,0.22)]">
-                    Engineered
-                  </span>
-                </motion.h1>
+            {/* Giant Header Heading */}
+            <motion.h1
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              className="text-white leading-[1.15] tracking-tight max-w-none mb-6 text-center mobile-visible"
+              style={{
+                fontFamily: "Satoshi, sans-serif",
+                fontSize: "clamp(34px, 5.5vw, 68px)",
+                fontWeight: 700,
+              }}
+            >
+              Stories We{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 font-bold drop-shadow-[0_0_15px_rgba(168,85,247,0.22)]">
+                Engineered
+              </span>
+            </motion.h1>
 
-                {/* Supporting Paragraph Description */}
-                <motion.p
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl font-normal tracking-wide mb-8 text-center text-pretty mobile-visible"
-                >
-                  A curated archive of immersive digital systems, full-stack enterprise nodes, optimized platforms, and cinematic user interfaces developed for forward-thinking brands.
-                </motion.p>
-              </div>
-            }
-          >
-            {/* Solid Black Area (Temporary Diagnostic Test) */}
-            <div 
-              className="w-full h-full bg-black rounded-2xl flex items-center justify-center border border-white/10"
-              style={{ backgroundColor: "#000000" }}
-            />
-          </ContainerScroll>
+            {/* Supporting Paragraph Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl font-normal tracking-wide text-center text-pretty mobile-visible"
+            >
+              A curated archive of immersive digital systems, full-stack enterprise nodes, optimized platforms, and cinematic user interfaces developed for forward-thinking brands.
+            </motion.p>
+          </div>
 
           {/* Category Filter Pills */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-wrap items-center gap-3 mb-20 relative z-10 mobile-visible"
+            className="flex flex-wrap items-center justify-center gap-3 mb-12 relative z-10 mobile-visible"
           >
             {FILTERS.map((filter) => {
               const isActive = activeFilter === filter;
