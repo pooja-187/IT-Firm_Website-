@@ -39,33 +39,15 @@ export function HeroBackgroundVideo() {
       }
     }
 
-    // Schedule video initialization strictly during browser idle / safe time
-    // so it NEVER contends with initial layout, FCP, or React hydration
-    const scheduleLoad = () => {
+    // Controlled short non-blocking defer:
+    // Allows initial HTML paint and React hydration to finish cleanly on frame 0,
+    // then immediately initiates background video streaming without waiting 2.5s
+    const timerId = setTimeout(() => {
       setShouldLoadVideo(true);
-    };
-
-    let idleId: number | null = null;
-    let timerId: NodeJS.Timeout | null = null;
-
-    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-      idleId = (window as unknown as {
-        requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number;
-      }).requestIdleCallback(scheduleLoad, { timeout: 2500 });
-    } else {
-      // Fallback for Safari and browsers without requestIdleCallback
-      timerId = setTimeout(scheduleLoad, 800);
-    }
+    }, 120);
 
     return () => {
-      if (idleId !== null && "cancelIdleCallback" in window) {
-        (window as unknown as {
-          cancelIdleCallback: (id: number) => void;
-        }).cancelIdleCallback(idleId);
-      }
-      if (timerId) {
-        clearTimeout(timerId);
-      }
+      clearTimeout(timerId);
     };
   }, []);
 
@@ -98,23 +80,26 @@ export function HeroBackgroundVideo() {
       />
 
       {/* Layer 2: HTML5 Video element
-          Source attached only after idle schedule; fades in only after first frame decodes */}
+          Source attached shortly after hydration with preload='auto' to prevent buffer stalls;
+          fades in seamlessly only after the first decoded frame */}
       {ENABLE_HERO_VIDEO && shouldLoadVideo && (
         <video
           ref={videoRef}
+          src="/videos/hero-video.mp4"
           autoPlay
           muted
           loop
           playsInline
-          preload="metadata"
-          onPlaying={() => setIsVideoPlaying(true)}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-out pointer-events-none select-none ${
+          preload="auto"
+          onPlaying={() => {
+            setIsVideoPlaying(true);
+          }}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out pointer-events-none select-none ${
             isVideoPlaying ? "opacity-100" : "opacity-0"
           }`}
-        >
-          <source src="/videos/hero-video.mp4" type="video/mp4" />
-        </video>
+        />
       )}
     </div>
   );
 }
+
