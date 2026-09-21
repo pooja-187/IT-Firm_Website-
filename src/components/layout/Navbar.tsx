@@ -28,6 +28,7 @@ export function Navbar() {
   const pathname = usePathname();
 
   useEffect(() => {
+    setIsOpen(false);
     if (pathname === "/about") {
       setActiveLink("About Us");
     } else if (pathname === "/services") {
@@ -312,10 +313,12 @@ export function Navbar() {
 
           {/* Mobile Drawer Trigger Menu Button */}
           <button
+            type="button"
             onClick={toggleMenu}
             aria-label="Toggle navigation drawer"
+            style={{ touchAction: "manipulation" }}
             className={cn(
-              "flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-all duration-300 lg:hidden hover:border-brand-purple/60 hover:bg-neutral-900",
+              "flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-all duration-300 lg:hidden hover:border-brand-purple/60 hover:bg-neutral-900 cursor-pointer select-none relative z-50",
               isOpen && "border-brand-pink/50 bg-black/60"
             )}
           >
@@ -331,8 +334,9 @@ export function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-2xl pt-28 pb-12 px-6 flex flex-col justify-between lg:hidden"
+            transition={{ duration: 0.25 }}
+            style={{ touchAction: "auto" }}
+            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-2xl pt-28 pb-12 px-6 flex flex-col justify-between lg:hidden overflow-y-auto overscroll-contain"
           >
             {/* Ambient visual background glow for mobile */}
             <div className="absolute top-[20%] left-1/2 -translate-x-1/2 h-[260px] w-[260px] rounded-full bg-brand-purple/10 blur-[80px] -z-10" />
@@ -354,7 +358,7 @@ export function Navbar() {
                         href={link.href}
                         onClick={() => {
                           setActiveLink(link.label);
-                          toggleMenu();
+                          setIsOpen(false);
                         }}
                         className={cn(
                           "group flex items-center justify-between text-2xl font-medium tracking-wide py-1 transition-all",
@@ -391,7 +395,7 @@ export function Navbar() {
               
               <Link
                 href="/contact"
-                onClick={toggleMenu}
+                onClick={() => setIsOpen(false)}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-purple to-brand-pink py-3 text-center text-sm font-semibold text-white shadow-[0_8px_20px_rgba(139,92,246,0.25)] hover:shadow-[0_10px_25px_rgba(139,92,246,0.35)] transition-all"
               >
                 {"Let's Talk"}
