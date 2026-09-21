@@ -6,6 +6,7 @@ import { motion, AnimatePresence, useInView, animate, useMotionValue, useSpring,
 import { Phone, Search, Layout, Code2, Rocket, TrendingUp, Sparkles } from "lucide-react";
 import { AppContainer } from "@/components/ui/AppContainer";
 import { HeroBackgroundVideo } from "@/components/ui/HeroBackgroundVideo";
+import { StarBackgroundVideo } from "@/components/ui/StarBackgroundVideo";
 import { apiService } from "@/utils/api";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -1434,11 +1435,8 @@ export default function Home() {
             className="relative w-full h-full flex items-center justify-center"
           >
 
-            {/* ── Solid Black Background (Temporary Diagnostic Test) ──────────────── */}
-            <div
-              className="absolute inset-0 w-full h-full pointer-events-none select-none bg-black"
-              style={{ zIndex: 0, backgroundColor: "#000000" }}
-            />
+            {/* ── Star Background Video / Poster (Controlled performance test) ──────────────── */}
+            <StarBackgroundVideo />
 
             {/* ── Cinematic dark overlay (dims the video, keeps text readable) */}
             <div
