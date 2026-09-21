@@ -432,7 +432,7 @@ export default function WorkPage() {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative w-full text-white pt-36 pb-32 overflow-hidden z-10 select-none"
+      className="relative w-full text-white pt-52 sm:pt-56 md:pt-40 pb-6 md:pb-8 overflow-hidden z-10 select-none"
       style={{ backgroundColor: "#050505" }}
     >
       {/* INTERACTIVE MOUSE SPOTLIGHT */}
@@ -501,18 +501,6 @@ export default function WorkPage() {
       <AppContainer>
         <div className="flex flex-col w-full max-w-6xl mx-auto px-4 md:px-8">
 
-          {/* Breadcrumbs Navigation */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center gap-2 text-xs font-normal text-white/30 mb-6 font-sans tracking-wide mobile-visible"
-          >
-            <Link href="/" className="hover:text-purple-400 transition-colors">Home</Link>
-            <span>&gt;</span>
-            <span className="text-white/60">Work</span>
-          </motion.div>
-
           {/* ──────────────────────────────────────────────────────────────────
               3D iPad/Device Tilt Scroll Animation (controlled performance test)
               Kill switch: ENABLE_WORK_DEVICE_TILT in WorkDeviceTilt.tsx
@@ -521,13 +509,13 @@ export default function WorkPage() {
           ────────────────────────────────────────────────────────────────── */}
           <WorkDeviceTilt
             titleComponent={
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center text-center w-full max-w-4xl mx-auto pt-2 sm:pt-4">
                 {/* Micro Top Label */}
                 <motion.span
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-[11px] font-semibold uppercase tracking-[0.3em] text-purple-400 font-sans block mb-4 mobile-visible"
+                  className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.35em] text-purple-400 font-sans block mb-5 sm:mb-6 mobile-visible"
                 >
                   Selected Work
                 </motion.span>
@@ -537,10 +525,10 @@ export default function WorkPage() {
                   initial={{ opacity: 0, y: 25 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-white leading-[1.15] tracking-tight max-w-none mb-8 text-center mobile-visible"
+                  className="text-white leading-[1.22] sm:leading-[1.15] tracking-tight max-w-none mb-6 sm:mb-8 text-center mobile-visible"
                   style={{
                     fontFamily: "Satoshi, sans-serif",
-                    fontSize: "clamp(34px, 5.5vw, 68px)",
+                    fontSize: "clamp(30px, 5vw, 68px)",
                     fontWeight: 700,
                   }}
                 >
@@ -555,7 +543,7 @@ export default function WorkPage() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl font-normal tracking-wide mb-8 text-center text-pretty mobile-visible"
+                  className="text-white/60 text-sm sm:text-base md:text-lg leading-relaxed sm:leading-loose max-w-xl sm:max-w-3xl font-normal tracking-wide mb-8 sm:mb-12 text-center text-pretty mx-auto mobile-visible px-2 sm:px-0"
                 >
                   A curated archive of immersive digital systems, full-stack enterprise nodes, optimized platforms, and cinematic user interfaces developed for forward-thinking brands.
                 </motion.p>

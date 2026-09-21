@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useRef } from "react";
 import { useScroll, useTransform, motion, MotionValue } from "framer-motion";
@@ -40,7 +40,7 @@ export function WorkDeviceTilt({ titleComponent }: WorkDeviceTiltProps) {
   });
 
   const scaleDimensions = () => {
-    return isMobile ? [0.7, 0.9] : [1.05, 1];
+    return isMobile ? [0.7, 0.9] : [0.92, 0.88];
   };
 
   const rotate = useTransform(
@@ -65,16 +65,16 @@ export function WorkDeviceTilt({ titleComponent }: WorkDeviceTiltProps) {
 
   return (
     <div
-      className="h-[28rem] sm:h-[36rem] md:h-[65rem] flex flex-col items-center justify-start relative p-2 md:p-6 pt-4 md:pt-10"
+      className="h-[32rem] sm:h-[38rem] md:h-[50rem] lg:h-[54rem] flex flex-col items-center justify-start relative p-0 pt-0"
       ref={containerRef}
     >
       <div
-        className="py-2 md:py-10 w-full relative"
+        className="pt-0 pb-4 md:pb-8 w-full relative"
         style={{ perspective: "1000px" }}
       >
         <motion.div
           style={{ translateY: translate }}
-          className="max-w-5xl mx-auto text-center"
+          className="max-w-4xl mx-auto text-center"
         >
           {titleComponent}
         </motion.div>
@@ -125,7 +125,7 @@ function DeviceCard({
         boxShadow:
           "0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 3px rgba(38, 38, 38, 1), 0 0 0 5px rgba(64, 64, 64, 1), 0 20px 40px rgba(0, 0, 0, 0.7), 0 45px 80px rgba(0, 0, 0, 0.6)",
       }}
-      className="max-w-5xl -mt-6 md:-mt-12 mx-auto h-[14rem] sm:h-[22rem] md:h-[40rem] w-full relative bg-neutral-950 p-[12px] md:p-[16px] rounded-[24px] md:rounded-[40px] shadow-2xl overflow-visible"
+      className="max-w-3xl lg:max-w-4xl -mt-2 sm:-mt-6 md:-mt-10 mx-auto h-[14rem] sm:h-[22rem] md:h-[28rem] lg:h-[32rem] w-full relative bg-neutral-950 p-[12px] md:p-[14px] lg:p-[16px] rounded-[24px] md:rounded-[36px] shadow-2xl overflow-visible"
     >
       <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0d0d0d] ring-1 ring-zinc-800/40 z-30 flex items-center justify-center opacity-80">
         <div className="w-[2px] h-[2px] rounded-full bg-blue-900/60" />

@@ -73,13 +73,13 @@ export const ImageAutoSlider = ({ projects: customProjects }: ImageAutoSliderPro
         }
       `}</style>
       
-      <div className="w-full relative overflow-hidden flex items-center justify-center bg-transparent py-8 z-10">
+      <div className="w-full relative overflow-hidden flex items-center justify-center bg-transparent pt-4 pb-2 md:pt-6 md:pb-2 z-10">
         {/* Left & Right gradient edge fades - zero GPU mask penalty */}
         <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-32 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent pointer-events-none z-20" />
         <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-32 bg-gradient-to-l from-[#050505] via-[#050505]/80 to-transparent pointer-events-none z-20" />
 
         {/* Scrolling images container */}
-        <div className="relative w-full flex items-center justify-center py-4">
+        <div className="relative w-full flex items-center justify-center pt-2 pb-0">
           <div className="scroll-container w-full max-w-none">
             <div className="infinite-scroll flex gap-8 w-max">
               {duplicatedProjects.map((project, index) => (
