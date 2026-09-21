@@ -914,7 +914,7 @@ export default function Home() {
         />
 
         {/* Subtle glowing violet/purple aura behind the stats panel */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[250px] rounded-full bg-brand-purple/5 blur-[120px] pointer-events-none -z-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[250px] rounded-full bg-brand-purple/5 blur-[120px] pointer-events-none -z-10 android-stats-glow" />
 
         <AppContainer>
           {/* Centered Typography Heading */}
@@ -1043,8 +1043,8 @@ export default function Home() {
         <motion.div style={{ opacity: processOpacity }} className="w-full h-full">
         
         {/* Soft ambient violet corner glows */}
-        <div className="absolute top-0 left-[-10%] w-[500px] h-[500px] rounded-full bg-brand-purple/2.5 blur-[130px] pointer-events-none -z-10 animate-pulse-slow" />
-        <div className="absolute bottom-0 right-[-10%] w-[500px] h-[500px] rounded-full bg-[#ec4899]/1.5 blur-[130px] pointer-events-none -z-10" />
+        <div className="absolute top-0 left-[-10%] w-[500px] h-[500px] rounded-full bg-brand-purple/2.5 blur-[130px] pointer-events-none -z-10 animate-pulse-slow android-process-glow-purple" />
+        <div className="absolute bottom-0 right-[-10%] w-[500px] h-[500px] rounded-full bg-[#ec4899]/1.5 blur-[130px] pointer-events-none -z-10 android-process-glow-pink" />
         
         {/* Subtle radial center lighting mask */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.02)_0%,transparent_70%)] pointer-events-none -z-10" />

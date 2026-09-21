@@ -52,6 +52,11 @@ export default function RootLayout({
     >
       <head>
         <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(typeof navigator!=="undefined"&&/Android/i.test(navigator.userAgent)){document.documentElement.classList.add("is-android");}`,
+          }}
+        />
       </head>
       <body className="min-h-screen flex flex-col text-text-primary" style={{ backgroundColor: '#050505' }}>
 
@@ -59,7 +64,7 @@ export default function RootLayout({
         <div className="fixed inset-0 pointer-events-none select-none" style={{ zIndex: 0 }}>
           {/* Left glow: purple, bottom-left corner — Mobile: zero-blur radial gradient; Desktop: original styling */}
           <div
-            className="block md:hidden absolute pointer-events-none"
+            className="block md:hidden absolute pointer-events-none android-hide-underlay"
             style={{
               width: '100vw',
               height: '100vh',
@@ -82,7 +87,7 @@ export default function RootLayout({
           />
           {/* Right glow: deep pink, bottom-right corner — Mobile: zero-blur radial gradient; Desktop: original styling */}
           <div
-            className="block md:hidden absolute pointer-events-none"
+            className="block md:hidden absolute pointer-events-none android-hide-underlay"
             style={{
               width: '100vw',
               height: '100vh',
@@ -115,7 +120,7 @@ export default function RootLayout({
         </div>
 
         <SmoothScroll>
-          <div className="relative flex flex-col min-h-screen w-full" style={{ zIndex: 1 }}>
+          <div className="relative flex flex-col min-h-screen w-full android-root-scroller" style={{ zIndex: 1 }}>
             {/* Seamless floating navbar container overlaying the hero section */}
             <div className="fixed top-0 left-0 right-0 z-50 w-full">
               <AppContainer>

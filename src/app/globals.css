@@ -237,3 +237,51 @@ html.lenis {
     -webkit-backdrop-filter: none !important;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Android Chrome GPU Compositor Optimization — Eliminates violet/purple flashes
+   during high-speed touch flick/fling scrolling.
+   Scoped STRICTLY to Android Chrome via html.is-android.
+   Desktop and iPhone / iOS Safari remain 100% UNCHANGED.
+   ───────────────────────────────────────────────────────────────────────────── */
+html.is-android {
+  background-color: #050505 !important;
+}
+
+html.is-android body,
+html.is-android .android-root-scroller {
+  background-color: #050505 !important;
+}
+
+/* Hide fixed full-viewport decorative purple/pink underlay on Android Chrome that
+   flashes through when compositor raster tiles lag during fast fling-scrolls */
+html.is-android .android-hide-underlay {
+  display: none !important;
+}
+
+/* Replace expensive multi-pass Gaussian blur shaders with zero-cost GPU-native radial gradients on Android */
+html.is-android .android-stats-glow {
+  filter: none !important;
+  background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.05) 0%, rgba(139, 92, 246, 0.02) 40%, transparent 70%) !important;
+}
+
+html.is-android .android-process-glow-purple {
+  filter: none !important;
+  background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.035) 0%, rgba(139, 92, 246, 0.01) 40%, transparent 70%) !important;
+}
+
+html.is-android .android-process-glow-pink {
+  filter: none !important;
+  background: radial-gradient(ellipse at center, rgba(236, 72, 153, 0.025) 0%, rgba(236, 72, 153, 0.008) 40%, transparent 70%) !important;
+}
+
+html.is-android .android-faq-glow-purple {
+  filter: none !important;
+  background: radial-gradient(ellipse at center, rgba(147, 51, 234, 0.06) 0%, rgba(147, 51, 234, 0.015) 40%, transparent 70%) !important;
+}
+
+html.is-android .android-faq-glow-pink {
+  filter: none !important;
+  background: radial-gradient(ellipse at center, rgba(190, 24, 93, 0.05) 0%, rgba(190, 24, 93, 0.012) 40%, transparent 70%) !important;
+}
+

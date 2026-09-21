@@ -267,7 +267,7 @@ export function FAQSection() {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full bg-purple-600/5 blur-[140px] pointer-events-none"
+          className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full bg-purple-600/5 blur-[140px] pointer-events-none android-faq-glow-purple"
         />
 
         {/* Ambient Nebula Violet Glow (Opposite corner) */}
@@ -283,7 +283,7 @@ export function FAQSection() {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-pink-700/5 blur-[140px] pointer-events-none"
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-pink-700/5 blur-[140px] pointer-events-none android-faq-glow-pink"
         />
       </div>
 
