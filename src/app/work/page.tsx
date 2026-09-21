@@ -7,6 +7,7 @@ import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { AppContainer } from "@/components/ui/AppContainer";
 import { ImageAutoSlider } from "@/components/ui/image-auto-slider";
+import { WorkDeviceTilt, ENABLE_WORK_DEVICE_TILT } from "@/components/ui/WorkDeviceTilt";
 import { apiService } from "@/utils/api";
 import { cn } from "@/utils/cn";
 
@@ -512,46 +513,89 @@ export default function WorkPage() {
             <span className="text-white/60">Work</span>
           </motion.div>
 
-          {/* Clean Header Section */}
-          <div className="flex flex-col items-center text-center mb-10 sm:mb-14 pt-4 md:pt-8">
-            {/* Micro Top Label */}
-            <motion.span
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[11px] font-semibold uppercase tracking-[0.3em] text-purple-400 font-sans block mb-4 mobile-visible"
-            >
-              Selected Work
-            </motion.span>
+          {/* ──────────────────────────────────────────────────────────────────
+              3D iPad/Device Tilt Scroll Animation (controlled performance test)
+              Kill switch: ENABLE_WORK_DEVICE_TILT in WorkDeviceTilt.tsx
+              When true  → ContainerScroll 3D tilt + 866KB work_video_dynamic.mp4
+              When false → static header below renders instead (no animation/video)
+          ────────────────────────────────────────────────────────────────── */}
+          <WorkDeviceTilt
+            titleComponent={
+              <div className="flex flex-col items-center">
+                {/* Micro Top Label */}
+                <motion.span
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-[11px] font-semibold uppercase tracking-[0.3em] text-purple-400 font-sans block mb-4 mobile-visible"
+                >
+                  Selected Work
+                </motion.span>
 
-            {/* Giant Header Heading */}
-            <motion.h1
-              initial={{ opacity: 0, y: 25 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-white leading-[1.15] tracking-tight max-w-none mb-6 text-center mobile-visible"
-              style={{
-                fontFamily: "Satoshi, sans-serif",
-                fontSize: "clamp(34px, 5.5vw, 68px)",
-                fontWeight: 700,
-              }}
-            >
-              Stories We{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 font-bold drop-shadow-[0_0_15px_rgba(168,85,247,0.22)]">
-                Engineered
-              </span>
-            </motion.h1>
+                {/* Giant Header Heading */}
+                <motion.h1
+                  initial={{ opacity: 0, y: 25 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-white leading-[1.15] tracking-tight max-w-none mb-8 text-center mobile-visible"
+                  style={{
+                    fontFamily: "Satoshi, sans-serif",
+                    fontSize: "clamp(34px, 5.5vw, 68px)",
+                    fontWeight: 700,
+                  }}
+                >
+                  Stories We{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 font-bold drop-shadow-[0_0_15px_rgba(168,85,247,0.22)]">
+                    Engineered
+                  </span>
+                </motion.h1>
 
-            {/* Supporting Paragraph Description */}
-            <motion.p
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl font-normal tracking-wide text-center text-pretty mobile-visible"
-            >
-              A curated archive of immersive digital systems, full-stack enterprise nodes, optimized platforms, and cinematic user interfaces developed for forward-thinking brands.
-            </motion.p>
-          </div>
+                {/* Supporting Paragraph Description */}
+                <motion.p
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl font-normal tracking-wide mb-8 text-center text-pretty mobile-visible"
+                >
+                  A curated archive of immersive digital systems, full-stack enterprise nodes, optimized platforms, and cinematic user interfaces developed for forward-thinking brands.
+                </motion.p>
+              </div>
+            }
+          />
+
+          {/* Fallback Static Header — shown only when ENABLE_WORK_DEVICE_TILT = false */}
+          {!ENABLE_WORK_DEVICE_TILT && (
+            <div className="flex flex-col items-center text-center mb-10 sm:mb-14 pt-4 md:pt-8">
+              <motion.span
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+                className="text-[11px] font-semibold uppercase tracking-[0.3em] text-purple-400 font-sans block mb-4 mobile-visible"
+              >
+                Selected Work
+              </motion.span>
+              <motion.h1
+                initial={{ opacity: 0, y: 25 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="text-white leading-[1.15] tracking-tight max-w-none mb-6 text-center mobile-visible"
+                style={{ fontFamily: "Satoshi, sans-serif", fontSize: "clamp(34px, 5.5vw, 68px)", fontWeight: 700 }}
+              >
+                Stories We{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 font-bold drop-shadow-[0_0_15px_rgba(168,85,247,0.22)]">
+                  Engineered
+                </span>
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                className="text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl font-normal tracking-wide text-center text-pretty mobile-visible"
+              >
+                A curated archive of immersive digital systems, full-stack enterprise nodes, optimized platforms, and cinematic user interfaces developed for forward-thinking brands.
+              </motion.p>
+            </div>
+          )}
 
           {/* Category Filter Pills */}
           <motion.div
