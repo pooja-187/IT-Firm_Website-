@@ -6,39 +6,10 @@ import { Clock, ArrowUpRight, X, BookOpen, Sparkles, Calendar } from "lucide-rea
 import Image from "next/image";
 import { apiService, Blog } from "@/utils/api";
 import Link from "next/link";
-
-// Helper to convert blog titles to URL-safe slugs
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-// ─── HIGH-FIDELITY CURATED FALLBACK BLOG DATA ───────────────────────────
-const MOCK_BLOGS: Blog[] = [
-  {
-    id: 1,
-    title: "Scaling Modern Web Applications in 2026",
-    date: "2026-05-18",
-    metaDescription: "A comprehensive guide to scaling high-traffic Next.js and Django platforms.",
-    description: "Building high-performance digital ecosystems requires decoupling your frontend and backend. Using Next.js for Server-Side Rendering (SSR) paired with a robust Django REST API on SQLite/PostgreSQL gives developer efficiency and scalability. In this guide, we dive deep into database index tuning, server caching layers (like Redis), CDN distribution strategies, and custom asset pipeline handling that keeps your applications lighting fast globally.",
-    images: []
-  },
-  {
-    id: 2,
-    title: "The Art of Cinematic UI/UX Design",
-    date: "2026-05-12",
-    metaDescription: "Learn how micro-animations and HSL colors elevate modern SaaS dashboards.",
-    description: "Design is not just what it looks like; it's how it feels and flows. Integrating GSAP, smooth CSS gradients, glassmorphism layers, and responsive column feeds creates trust and a premium feel. We explore HSL color tailoring, the psychology behind 3D rotational tilt cards, micro-interactions, and using spring-based motion curves instead of simple linear animations to create software that feels truly premium and alive.",
-    images: []
-  }
-];
+import { getAllBlogs, slugify } from "@/data/blogData";
 
 export function BlogSection() {
-  const [blogs, setBlogs] = useState<Blog[]>(MOCK_BLOGS);
+  const [blogs, setBlogs] = useState<Blog[]>(getAllBlogs);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
@@ -78,17 +49,21 @@ export function BlogSection() {
   };
 
   useEffect(() => {
+    let isMounted = true;
     async function loadBlogs() {
       try {
         const fetchedBlogs = await apiService.getBlogs();
-        if (fetchedBlogs && fetchedBlogs.length > 0) {
+        if (isMounted && fetchedBlogs && fetchedBlogs.length > 0) {
           setBlogs(fetchedBlogs);
         }
       } catch (err) {
-        console.error("Failed to load blog posts, using local defaults", err);
+        console.warn("Keeping central static blogs dataset for BlogSection:", err);
       }
     }
     loadBlogs();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Auto-rotation timer logic (cycles index every 3 seconds, pauses on hover/pause state or when offscreen)
@@ -102,7 +77,7 @@ export function BlogSection() {
   }, [isInView, isPaused, blogs.length]);
 
   // Extract the active featured blog
-  const featuredBlog = blogs[activeIndex] || MOCK_BLOGS[0] || blogs[0];
+  const featuredBlog = blogs[activeIndex] || blogs[0];
 
   // Format Date beautifully
   const formattedDate = new Date(featuredBlog.date).toLocaleDateString("en-US", {

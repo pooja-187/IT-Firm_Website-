@@ -9,39 +9,10 @@ import { AppContainer } from "@/components/ui/AppContainer";
 import { apiService, Blog } from "@/utils/api";
 import { cn } from "@/utils/cn";
 import HalideTopoHero from "@/components/ui/halide-topo-hero";
-
-// Curated High-Fidelity Fallback Blog Data
-const MOCK_BLOGS: Blog[] = [
-  {
-    id: 1,
-    title: "Scaling Modern Web Applications in 2026",
-    date: "2026-05-18",
-    metaDescription: "A comprehensive guide to scaling high-traffic Next.js and Django platforms.",
-    description: "Building high-performance digital ecosystems requires decoupling your frontend and backend. Using Next.js for Server-Side Rendering (SSR) paired with a robust Django REST API on SQLite/PostgreSQL gives developer efficiency and scalability. In this guide, we dive deep into database index tuning, server caching layers (like Redis), CDN distribution strategies, and custom asset pipeline handling that keeps your applications lighting fast globally.",
-    images: []
-  },
-  {
-    id: 2,
-    title: "The Art of Cinematic UI/UX Design",
-    date: "2026-05-12",
-    metaDescription: "Learn how micro-animations and HSL colors elevate modern SaaS dashboards.",
-    description: "Design is not just what it looks like; it's how it feels and flows. Integrating GSAP, smooth CSS gradients, glassmorphism layers, and responsive column feeds creates trust and a premium feel. We explore HSL color tailoring, the psychology behind 3D rotational tilt cards, micro-interactions, and using spring-based motion curves instead of simple linear animations to create software that feels truly premium and alive.",
-    images: []
-  }
-];
-
-// Helper to convert blog titles to URL-safe slugs
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
+import { getAllBlogs, slugify } from "@/data/blogData";
 
 export default function BlogListingPage() {
-  const [blogs, setBlogs] = useState<Blog[]>(MOCK_BLOGS);
+  const [blogs, setBlogs] = useState<Blog[]>(getAllBlogs);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -64,17 +35,21 @@ export default function BlogListingPage() {
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
 
   useEffect(() => {
+    let isMounted = true;
     async function loadBlogs() {
       try {
         const fetchedBlogs = await apiService.getBlogs();
-        if (fetchedBlogs && fetchedBlogs.length > 0) {
+        if (isMounted && fetchedBlogs && fetchedBlogs.length > 0) {
           setBlogs(fetchedBlogs);
         }
       } catch (err) {
-        console.error("Failed to load blog posts, keeping local defaults", err);
+        console.warn("Keeping central static blogs dataset:", err);
       }
     }
     loadBlogs();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {

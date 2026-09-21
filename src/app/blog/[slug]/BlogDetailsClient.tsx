@@ -9,101 +9,77 @@ import { ArrowLeft, ArrowUpRight, Calendar, Clock, User, MessageSquare } from "l
 import { AppContainer } from "@/components/ui/AppContainer";
 import { apiService, Blog, Work } from "@/utils/api";
 import { cn } from "@/utils/cn";
-
-// Helper to convert blog titles to URL-safe slugs
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-const MOCK_BLOGS: Blog[] = [
-  {
-    id: 1,
-    title: "Scaling Modern Web Applications in 2026",
-    date: "2026-05-18",
-    metaDescription: "A comprehensive guide to scaling high-traffic Next.js and Django platforms.",
-    description: "Building high-performance digital ecosystems requires decoupling your frontend and backend. Using Next.js for Server-Side Rendering (SSR) paired with a robust Django REST API on SQLite/PostgreSQL gives developer efficiency and scalability. In this guide, we dive deep into database index tuning, server caching layers (like Redis), CDN distribution strategies, and custom asset pipeline handling that keeps your applications lighting fast globally.",
-    images: []
-  },
-  {
-    id: 2,
-    title: "The Art of Cinematic UI/UX Design",
-    date: "2026-05-12",
-    metaDescription: "Learn how micro-animations and HSL colors elevate modern SaaS dashboards.",
-    description: "Design is not just what it looks like; it's how it feels and flows. Integrating GSAP, smooth CSS gradients, glassmorphism layers, and responsive column feeds creates trust and a premium feel. We explore HSL color tailoring, the psychology behind 3D rotational tilt cards, micro-interactions, and using spring-based motion curves instead of simple linear animations to create software that feels truly premium and alive.",
-    images: []
-  }
-];
+import { getAllBlogs, getBlogBySlug, slugify } from "@/data/blogData";
 
 export default function BlogDetailsClient() {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
 
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
+  // Resolve initial article immediately from static/central data
+  const initialBlog = getBlogBySlug(slug);
+  const initialRelated = getAllBlogs()
+    .filter((b) => slugify(b.title) !== slug)
+    .slice(0, 3);
+
+  const [blog, setBlog] = useState<Blog | null>(initialBlog || null);
+  const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>(initialRelated);
   const [relatedProject, setRelatedProject] = useState<Work | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(!initialBlog);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadBlogData() {
-      if (!slug) return;
+    if (!slug) return;
+    let isMounted = true;
+
+    async function revalidateBlogData() {
       try {
-        setLoading(true);
-        setError(null);
+        // Non-blocking concurrent background fetch
+        const [blogsResult, worksResult] = await Promise.allSettled([
+          apiService.getBlogs(),
+          apiService.getWorks(),
+        ]);
 
-        // 1. Fetch all blogs from API or fallback
-        let allBlogs: Blog[] = [];
-        try {
-          const fetched = await apiService.getBlogs();
-          if (fetched && fetched.length > 0) {
-            allBlogs = fetched;
-          } else {
-            allBlogs = MOCK_BLOGS;
+        if (!isMounted) return;
+
+        // 1. Revalidate blog content if API returned fresh data
+        if (blogsResult.status === "fulfilled" && blogsResult.value && blogsResult.value.length > 0) {
+          const allFetched = blogsResult.value;
+          const freshBlog = allFetched.find((b) => slugify(b.title) === slug);
+          if (freshBlog) {
+            setBlog(freshBlog);
           }
-        } catch {
-          allBlogs = MOCK_BLOGS;
-        }
-        
-        // 2. Find matching blog based on slugified title
-        const currentBlog = allBlogs.find((b) => slugify(b.title) === slug);
-
-        if (!currentBlog) {
+          const freshOthers = allFetched.filter((b) => slugify(b.title) !== slug).slice(0, 3);
+          if (freshOthers.length > 0) {
+            setRelatedBlogs(freshOthers);
+          }
+        } else if (!initialBlog) {
           setError("The requested article could not be located in our archives.");
-          setLoading(false);
-          return;
         }
 
-        setBlog(currentBlog);
-
-        // 3. Select 3 related articles (excluding the current one)
-        const others = allBlogs.filter((b) => b.id !== currentBlog.id).slice(0, 3);
-        setRelatedBlogs(others);
-
-        // 4. Fetch portfolio projects to bind related showcase project dynamically
-        try {
-          const fetchedProjects = await apiService.getWorks();
-          if (fetchedProjects && fetchedProjects.length > 0) {
-            const match = fetchedProjects.find(
-              (p) => p.category.toLowerCase().includes(currentBlog.title.toLowerCase().substring(0, 4))
-            );
-            setRelatedProject(match || fetchedProjects[0]);
-          }
-        } catch {}
-      } catch (err: any) {
-        console.error("Failed to load blog details:", err);
-        setError("Unable to connect to the Manzio publishing server.");
+        // 2. Populate related showcase project in background
+        if (worksResult.status === "fulfilled" && worksResult.value && worksResult.value.length > 0) {
+          const fetchedProjects = worksResult.value;
+          const currentTitle = blog?.title || initialBlog?.title || "";
+          const match = fetchedProjects.find(
+            (p) => p.category.toLowerCase().includes(currentTitle.toLowerCase().substring(0, 4))
+          );
+          setRelatedProject(match || fetchedProjects[0]);
+        }
+      } catch (err) {
+        console.warn("Background blog revalidation note:", err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
-    loadBlogData();
+    revalidateBlogData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [slug]);
 
   if (loading) {
@@ -122,7 +98,7 @@ export default function BlogDetailsClient() {
           <h2 className="text-2xl sm:text-3xl font-semibold mb-4" style={{ fontFamily: "Satoshi, sans-serif", fontWeight: 600 }}>Article Not Found</h2>
           <p className="text-white/50 text-sm font-normal mb-8 leading-relaxed">{error || "The article is not currently active in our database."}</p>
           <button 
-            onClick={() => router.push("/#blog")} 
+            onClick={() => router.push("/blog")} 
             className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-[11px] font-semibold text-white tracking-widest uppercase transition-all duration-300 bg-white/5 hover:bg-white/10 border border-white/10"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
@@ -158,7 +134,7 @@ export default function BlogDetailsClient() {
             className="mb-12"
           >
             <Link 
-              href="/#blog" 
+              href="/blog" 
               className="inline-flex items-center gap-2 text-xs font-semibold text-white/60 hover:text-purple-400 transition-colors duration-300 font-sans tracking-wide"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -203,9 +179,9 @@ export default function BlogDetailsClient() {
 
           {/* 2. FEATURED IMAGE FRAME */}
           <motion.div 
-            initial={{ opacity: 0, scale: 1.02, filter: "blur(6px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            transition={{ duration: 1.2, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
             className="relative overflow-hidden aspect-[21/9] rounded-[2.5rem] border border-white/[0.06] bg-[#07070a]/45 shadow-[0_20px_50px_rgba(0,0,0,0.6)] mb-14 group"
           >
             {/* Ambient inner bloom glow */}
