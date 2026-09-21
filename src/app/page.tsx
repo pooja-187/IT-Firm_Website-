@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence, useInView, animate, useMotionValue, useSpring, useMotionTemplate, useScroll, useTransform } from "framer-motion";
 import { Phone, Search, Layout, Code2, Rocket, TrendingUp, Sparkles } from "lucide-react";
 import { AppContainer } from "@/components/ui/AppContainer";
+import { HeroBackgroundVideo } from "@/components/ui/HeroBackgroundVideo";
 import { apiService } from "@/utils/api";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -777,11 +778,8 @@ export default function Home() {
       {/* Section with fullscreen solid black background, subtle readability overlay, top vignette fade, and vertically centered hero content */}
       <section id="home" className="relative min-h-[100svh] md:min-h-screen w-full flex flex-col items-center justify-center select-none overflow-hidden">
 
-        {/* FULLSCREEN SOLID BLACK BACKGROUND (Temporary Diagnostic Test) */}
-        <div 
-          className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none select-none bg-black" 
-          style={{ backgroundColor: "#000000" }} 
-        />
+        {/* HERO BACKGROUND VIDEO / POSTER (Controlled performance test) */}
+        <HeroBackgroundVideo />
 
         {/* OVERLAYS */}
         {/* 2a. Base dimming readability mask - slightly darker on mobile for cinematic readability */}
