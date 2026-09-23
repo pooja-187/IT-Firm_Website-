@@ -21,11 +21,28 @@ const NAV_LINKS = [
 
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(() => {
+    if (typeof window !== "undefined" && (window as any).__isNavOpen) {
+      return true;
+    }
+    return false;
+  });
   const [activeLink, setActiveLink] = useState("Home");
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const isScrolled = useScroll(20);
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).__reactNavHydrated = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).__isNavOpen = isOpen;
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     setIsOpen(false);
@@ -388,6 +405,7 @@ export function Navbar() {
 
           {/* Mobile Drawer Trigger Menu Button with 0ms Touch Response */}
           <button
+            id="mobile-nav-toggle-btn"
             type="button"
             onPointerDown={toggleMenu}
             onClick={toggleMenu}
