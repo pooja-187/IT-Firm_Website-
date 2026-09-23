@@ -159,9 +159,8 @@ const HalideTopoHero: React.FC<HalideTopoHeroProps> = ({ children }) => {
 
         {/* ── INTERFACE OVERLAY ── */}
         <div
-          className="absolute inset-0 z-10 pointer-events-none"
+          className="absolute inset-0 z-10 pointer-events-none pt-28 sm:pt-32 md:pt-36 pb-12 sm:pb-16 px-6 sm:px-12 md:px-16"
           style={{
-            padding: "4rem",
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gridTemplateRows: "auto 1fr auto",
@@ -169,7 +168,7 @@ const HalideTopoHero: React.FC<HalideTopoHeroProps> = ({ children }) => {
           }}
         >
           {/* Top-left brand monogram */}
-          <div className="text-white/70 text-sm font-bold tracking-[0.2em] uppercase self-start">
+          <div className="text-white/70 text-xs sm:text-sm font-bold tracking-[0.2em] uppercase self-start">
             MANZIO_JOURNAL
           </div>
 
@@ -188,8 +187,8 @@ const HalideTopoHero: React.FC<HalideTopoHeroProps> = ({ children }) => {
             style={{
               gridColumn: "1 / -1",
               alignSelf: "center",
-              fontSize: "clamp(3rem, 9vw, 9rem)",
-              lineHeight: 0.85,
+              fontSize: "clamp(2.75rem, 8.5vw, 9rem)",
+              lineHeight: 0.88,
               letterSpacing: "-0.04em",
               mixBlendMode: "difference",
             }}
