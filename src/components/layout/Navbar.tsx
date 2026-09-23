@@ -44,14 +44,30 @@ export function Navbar() {
     }
   }, [pathname]);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  const lastToggleRef = React.useRef(0);
+  const toggleMenu = (e?: React.SyntheticEvent) => {
+    if (e) {
+      if (e.type === "pointerdown" || e.type === "touchstart") {
+        e.preventDefault();
+      }
+    }
+    const now = Date.now();
+    if (now - lastToggleRef.current < 150) return;
+    lastToggleRef.current = now;
+    setIsOpen((prev) => !prev);
+  };
 
-  // Responsive device tracker
-  const [isMobile, setIsMobile] = useState(false);
+  // Responsive device tracker with lazy initial check to avoid mount re-render
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, { passive: true });
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -97,16 +113,13 @@ export function Navbar() {
   const monoLogoBlur = useTransform(progress, [0.45, 1], [4, 0]);
   const monoLogoFilter = useMotionTemplate`blur(${monoLogoBlur}px)`;
 
-  // Body scroll locking when mobile menu is open
+  // Non-layout-thrashing scroll lock when mobile menu is open
   useEffect(() => {
     if (isOpen) {
-      const originalOverflow = document.body.style.overflow;
-      const originalTouchAction = document.body.style.touchAction;
-      document.body.style.overflow = "hidden";
-      document.body.style.touchAction = "none";
+      const prevOverflow = document.documentElement.style.overflow;
+      document.documentElement.style.overflow = "hidden";
       return () => {
-        document.body.style.overflow = originalOverflow;
-        document.body.style.touchAction = originalTouchAction;
+        document.documentElement.style.overflow = prevOverflow;
       };
     }
   }, [isOpen]);
@@ -116,15 +129,15 @@ export function Navbar() {
     closed: {
       opacity: 0,
       transition: {
-        duration: 0.2,
-        ease: "easeInOut" as const,
+        duration: 0.18,
+        ease: "easeOut" as const,
       },
     },
     open: {
       opacity: 1,
       transition: {
-        duration: 0.25,
-        ease: "easeInOut" as const,
+        duration: 0.2,
+        ease: "easeOut" as const,
       },
     },
   } as const;
@@ -132,30 +145,8 @@ export function Navbar() {
   const drawerVariants = {
     closed: {
       opacity: 0,
-      y: -20,
-      scale: 0.98,
-      transition: {
-        duration: 0.2,
-        ease: [0.16, 1, 0.3, 1] as const,
-      },
-    },
-    open: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        duration: 0.35,
-        ease: [0.16, 1, 0.3, 1] as const,
-        staggerChildren: 0.06,
-        delayChildren: 0.04,
-      },
-    },
-  } as const;
-
-  const linkVariants = {
-    closed: {
-      opacity: 0,
-      x: -12,
+      y: -12,
+      scale: 0.99,
       transition: {
         duration: 0.15,
         ease: "easeOut" as const,
@@ -163,9 +154,31 @@ export function Navbar() {
     },
     open: {
       opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.25,
+        ease: [0.16, 1, 0.3, 1] as const,
+        staggerChildren: 0.04,
+        delayChildren: 0.02,
+      },
+    },
+  } as const;
+
+  const linkVariants = {
+    closed: {
+      opacity: 0,
+      x: -10,
+      transition: {
+        duration: 0.1,
+        ease: "easeOut" as const,
+      },
+    },
+    open: {
+      opacity: 1,
       x: 0,
       transition: {
-        duration: 0.3,
+        duration: 0.25,
         ease: [0.16, 1, 0.3, 1] as const,
       },
     },
@@ -174,9 +187,9 @@ export function Navbar() {
   const footerVariants = {
     closed: {
       opacity: 0,
-      y: 10,
+      y: 8,
       transition: {
-        duration: 0.15,
+        duration: 0.1,
         ease: "easeOut" as const,
       },
     },
@@ -184,8 +197,8 @@ export function Navbar() {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.3,
-        delay: 0.18,
+        duration: 0.25,
+        delay: 0.12,
         ease: [0.16, 1, 0.3, 1] as const,
       },
     },
@@ -373,9 +386,10 @@ export function Navbar() {
             </Link>
           </motion.div>
 
-          {/* Mobile Drawer Trigger Menu Button */}
+          {/* Mobile Drawer Trigger Menu Button with 0ms Touch Response */}
           <button
             type="button"
+            onPointerDown={toggleMenu}
             onClick={toggleMenu}
             aria-label="Toggle navigation drawer"
             style={{ touchAction: "manipulation" }}
@@ -397,12 +411,26 @@ export function Navbar() {
             initial="closed"
             animate="open"
             exit="closed"
-            style={{ touchAction: "auto" }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl pt-28 pb-12 px-6 flex flex-col justify-between lg:hidden overflow-y-auto overscroll-contain"
+            style={{
+              touchAction: "pan-y",
+              transform: "translate3d(0,0,0)",
+              willChange: "opacity, transform",
+            }}
+            className="fixed inset-0 z-50 bg-[#060608]/95 backdrop-blur-md pt-28 pb-12 px-6 flex flex-col justify-between lg:hidden overflow-y-auto overscroll-contain"
           >
             {/* Ambient visual background glow for mobile */}
-            <div className="absolute top-[20%] left-1/2 -translate-x-1/2 h-[260px] w-[260px] rounded-full bg-brand-purple/10 blur-[80px] -z-10" />
-            <div className="absolute bottom-[10%] right-[-10%] h-[200px] w-[200px] rounded-full bg-brand-pink/15 blur-[60px] -z-10" />
+            <div
+              className="absolute top-[20%] left-1/2 -translate-x-1/2 h-[260px] w-[260px] rounded-full pointer-events-none -z-10"
+              style={{
+                background: "radial-gradient(circle at center, rgba(124, 58, 237, 0.18) 0%, rgba(124, 58, 237, 0.06) 45%, transparent 70%)",
+              }}
+            />
+            <div
+              className="absolute bottom-[10%] right-[-10%] h-[200px] w-[200px] rounded-full pointer-events-none -z-10"
+              style={{
+                background: "radial-gradient(circle at center, rgba(236, 72, 153, 0.16) 0%, rgba(236, 72, 153, 0.05) 45%, transparent 70%)",
+              }}
+            />
 
             <div className="flex flex-col gap-10 mt-8">
               <motion.div
