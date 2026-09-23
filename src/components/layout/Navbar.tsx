@@ -97,18 +97,46 @@ export function Navbar() {
   const monoLogoBlur = useTransform(progress, [0.45, 1], [4, 0]);
   const monoLogoFilter = useMotionTemplate`blur(${monoLogoBlur}px)`;
 
-  // Framer Motion Animation Variants for mobile menu
+  // Body scroll locking when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      const originalTouchAction = document.body.style.touchAction;
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.touchAction = originalTouchAction;
+      };
+    }
+  }, [isOpen]);
+
+  // Framer Motion Animation Variants for mobile menu overlay, drawer list, and individual links
+  const overlayVariants = {
+    closed: {
+      opacity: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut" as const,
+      },
+    },
+    open: {
+      opacity: 1,
+      transition: {
+        duration: 0.25,
+        ease: "easeInOut" as const,
+      },
+    },
+  } as const;
+
   const drawerVariants = {
     closed: {
       opacity: 0,
-      y: -30,
+      y: -20,
       scale: 0.98,
       transition: {
-        duration: 0.3,
+        duration: 0.2,
         ease: [0.16, 1, 0.3, 1] as const,
-        staggerChildren: 0.05,
-        staggerDirection: -1,
-        when: "afterChildren",
       },
     },
     open: {
@@ -116,17 +144,51 @@ export function Navbar() {
       y: 0,
       scale: 1,
       transition: {
-        duration: 0.4,
+        duration: 0.35,
         ease: [0.16, 1, 0.3, 1] as const,
-        staggerChildren: 0.08,
-        delayChildren: 0.1,
+        staggerChildren: 0.06,
+        delayChildren: 0.04,
       },
     },
   } as const;
 
   const linkVariants = {
-    closed: { opacity: 0, x: -15 },
-    open: { opacity: 1, x: 0 },
+    closed: {
+      opacity: 0,
+      x: -12,
+      transition: {
+        duration: 0.15,
+        ease: "easeOut" as const,
+      },
+    },
+    open: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.3,
+        ease: [0.16, 1, 0.3, 1] as const,
+      },
+    },
+  } as const;
+
+  const footerVariants = {
+    closed: {
+      opacity: 0,
+      y: 10,
+      transition: {
+        duration: 0.15,
+        ease: "easeOut" as const,
+      },
+    },
+    open: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.3,
+        delay: 0.18,
+        ease: [0.16, 1, 0.3, 1] as const,
+      },
+    },
   } as const;
 
   const navStyle = isMobile
@@ -318,7 +380,7 @@ export function Navbar() {
             aria-label="Toggle navigation drawer"
             style={{ touchAction: "manipulation" }}
             className={cn(
-              "flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-all duration-300 lg:hidden hover:border-brand-purple/60 hover:bg-neutral-900 cursor-pointer select-none relative z-50",
+              "flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-all duration-300 lg:hidden hover:border-brand-purple/60 hover:bg-neutral-900 cursor-pointer select-none relative z-[60]",
               isOpen && "border-brand-pink/50 bg-black/60"
             )}
           >
@@ -331,12 +393,12 @@ export function Navbar() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            variants={overlayVariants}
+            initial="closed"
+            animate="open"
+            exit="closed"
             style={{ touchAction: "auto" }}
-            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-2xl pt-28 pb-12 px-6 flex flex-col justify-between lg:hidden overflow-y-auto overscroll-contain"
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl pt-28 pb-12 px-6 flex flex-col justify-between lg:hidden overflow-y-auto overscroll-contain"
           >
             {/* Ambient visual background glow for mobile */}
             <div className="absolute top-[20%] left-1/2 -translate-x-1/2 h-[260px] w-[260px] rounded-full bg-brand-purple/10 blur-[80px] -z-10" />
@@ -380,7 +442,13 @@ export function Navbar() {
             </div>
 
             {/* Mobile Drawer Footer Contacts */}
-            <div className="flex flex-col gap-6 border-t border-neutral-900 pt-6">
+            <motion.div
+              variants={footerVariants}
+              initial="closed"
+              animate="open"
+              exit="closed"
+              className="flex flex-col gap-6 border-t border-neutral-900 pt-6"
+            >
               <div className="flex flex-col gap-1.5">
                 <span className="text-[10px] uppercase tracking-[0.25em] text-text-muted">
                   {"Kerala’s Leading Software Builders"}
@@ -401,7 +469,7 @@ export function Navbar() {
                 {"Let's Talk"}
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
