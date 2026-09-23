@@ -416,7 +416,7 @@ export function Navbar() {
               transform: "translate3d(0,0,0)",
               willChange: "opacity, transform",
             }}
-            className="fixed inset-0 z-50 bg-[#060608]/95 backdrop-blur-md pt-28 pb-12 px-6 flex flex-col justify-between lg:hidden overflow-y-auto overscroll-contain"
+            className="fixed inset-0 z-50 bg-[#060608]/95 backdrop-blur-md pt-16 pb-8 px-6 flex flex-col justify-between lg:hidden overflow-y-auto overscroll-contain"
           >
             {/* Ambient visual background glow for mobile */}
             <div
@@ -432,25 +432,26 @@ export function Navbar() {
               }}
             />
 
-            <div className="flex flex-col gap-8 mt-2">
+            <div className="flex flex-col gap-6 mt-0">
               <motion.div
                 variants={drawerVariants}
                 initial="closed"
                 animate="open"
                 exit="closed"
-                className="flex flex-col gap-4"
+                className="flex flex-col gap-3.5"
               >
-                {/* Back button */}
-                <motion.div variants={linkVariants} className="pb-3 border-b border-white/[0.06]">
+                {/* Back button header */}
+                <motion.div variants={linkVariants} className="pb-2 border-b border-white/[0.06] flex items-center justify-between">
                   <button
                     type="button"
                     onPointerDown={toggleMenu}
                     onClick={toggleMenu}
-                    className="group inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/50 hover:text-white transition-all duration-300 py-1.5 px-3.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-brand-purple/40 backdrop-blur-md cursor-pointer"
+                    className="group inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/60 hover:text-white transition-all duration-300 py-1.5 px-3.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-brand-purple/40 backdrop-blur-md cursor-pointer"
                   >
-                    <ArrowLeft className="h-3.5 w-3.5 text-white/50 group-hover:text-brand-purple group-hover:-translate-x-0.5 transition-all duration-300" />
+                    <ArrowLeft className="h-3.5 w-3.5 text-white/60 group-hover:text-brand-purple group-hover:-translate-x-0.5 transition-all duration-300" />
                     <span>Back</span>
                   </button>
+                  <span className="text-[9px] uppercase tracking-[0.2em] text-white/30 font-medium">Navigation</span>
                 </motion.div>
 
                 {NAV_LINKS.map((link) => {
