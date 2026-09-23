@@ -28,6 +28,7 @@ export function HeroSplineBackground() {
       style={{
         position: 'relative',
         width: '100%',
+        maxWidth: '100%',
         height: '100vh',
         pointerEvents: 'auto',
         overflow: 'hidden',
@@ -38,6 +39,7 @@ export function HeroSplineBackground() {
         <Spline
           style={{
             width: '100%',
+            maxWidth: '100%',
             height: '100vh',
             pointerEvents: 'auto',
           }}

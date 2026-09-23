@@ -317,16 +317,15 @@ export default function AboutPage() {
       />
 
       {/* Space Singularity Cinematic 100vh Hero Section */}
-      <section className="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden z-20">
+      <section className="relative w-full max-w-full h-screen min-h-[560px] flex flex-col items-center justify-center overflow-hidden z-20 px-2 sm:px-4">
 
         {/* Galaxy Spline 3D Background */}
-        <div className="absolute inset-0 w-full h-full z-0 select-none overflow-hidden">
+        <div className="absolute inset-0 w-full h-full z-0 select-none overflow-hidden pointer-events-none">
           <HeroSplineBackground />
         </div>
 
-
         {/* Perfectly Centered Cinematic Typography */}
-        <div className="relative z-30 max-w-4xl px-6 text-center select-text pointer-events-none">
+        <div className="relative z-30 w-full max-w-4xl px-4 sm:px-6 text-center select-text pointer-events-none">
           <motion.h1
             initial={{ opacity: 0, y: 25, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -334,19 +333,19 @@ export default function AboutPage() {
             className="text-white tracking-[-0.03em] leading-[1.2] text-center pointer-events-auto"
             style={{
               fontFamily: "Satoshi, sans-serif",
-              fontSize: "clamp(24px, 4.2vw, 48px)",
+              fontSize: "clamp(22px, 4.2vw, 48px)",
               textShadow: "0 0 30px rgba(255, 255, 255, 0.22), 0 0 60px rgba(139, 92, 246, 0.12)",
             }}
           >
-            <span className="block text-white/90 font-bold tracking-[-0.03em] mb-2 text-[1.0em] sm:text-[1.05em]">Digital Experiences</span>
-            <span className="block whitespace-nowrap text-white font-bold tracking-[-0.04em] pb-1 text-[1.6em] sm:text-[1.7em] leading-tight">Engineered With Obsession</span>
+            <span className="block text-white/90 font-bold tracking-[-0.03em] mb-2 text-[0.95em] sm:text-[1.05em]">Digital Experiences</span>
+            <span className="block text-white font-bold tracking-[-0.04em] pb-1 text-[1.4em] sm:text-[1.7em] leading-tight sm:whitespace-nowrap">Engineered With Obsession</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="text-white/60 font-sans font-normal tracking-[0.01em] text-xs sm:text-sm md:text-[15px] max-w-xl mx-auto mt-6 leading-relaxed select-text pointer-events-auto"
+            className="text-white/60 font-sans font-normal tracking-[0.01em] text-xs sm:text-sm md:text-[15px] max-w-sm sm:max-w-xl mx-auto mt-4 sm:mt-6 leading-relaxed select-text pointer-events-auto px-2 sm:px-0 text-pretty"
           >
             Backed by 8+ years of excellence, we build high-performance digital solutions that drive growth and innovation.
           </motion.p>
