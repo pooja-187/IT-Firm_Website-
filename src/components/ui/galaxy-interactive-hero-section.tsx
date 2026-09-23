@@ -6,14 +6,34 @@ import { Suspense, lazy } from 'react';
 const Spline = lazy(() => import('@splinetool/react-spline'));
 
 export function HeroSplineBackground() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(true);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { rootMargin: "200px 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div style={{
-      position: 'relative',
-      width: '100%',
-      height: '100vh',
-      pointerEvents: 'auto',
-      overflow: 'hidden',
-    }}>
+    <div
+      ref={containerRef}
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100vh',
+        pointerEvents: 'auto',
+        overflow: 'hidden',
+        visibility: isInView ? 'visible' : 'hidden',
+      }}
+    >
       <Suspense fallback={<div className="absolute inset-0 bg-[#050505]" />}>
         <Spline
           style={{

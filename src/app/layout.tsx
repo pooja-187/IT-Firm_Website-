@@ -54,43 +54,7 @@ export default function RootLayout({
         <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet" />
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-              if(typeof navigator!=="undefined"&&/Android/i.test(navigator.userAgent)){document.documentElement.classList.add("is-android");}
-              window.__isNavOpen=false;
-              window.__reactNavHydrated=false;
-              window.__toggleMobileNav=function(e){
-                if(e&&(e.type==='pointerdown'||e.type==='touchstart'))e.preventDefault();
-                window.__isNavOpen=!window.__isNavOpen;
-                var drawer=document.getElementById('mobile-nav-drawer');
-                var btn=document.getElementById('mobile-nav-toggle-btn');
-                if(drawer){
-                  if(window.__isNavOpen){
-                    drawer.style.display='flex';
-                    drawer.style.opacity='1';
-                    drawer.style.visibility='visible';
-                    drawer.style.pointerEvents='auto';
-                    document.documentElement.style.overflow='hidden';
-                  }else{
-                    drawer.style.display='none';
-                    drawer.style.opacity='0';
-                    drawer.style.visibility='hidden';
-                    drawer.style.pointerEvents='none';
-                    document.documentElement.style.overflow='';
-                  }
-                }
-                if(btn){
-                  btn.setAttribute('aria-expanded',window.__isNavOpen?'true':'false');
-                }
-              };
-              document.addEventListener('pointerdown',function(e){
-                var t=e.target;
-                if(t&&t.closest&&t.closest('#mobile-nav-toggle-btn')){
-                  if(!window.__reactNavHydrated){
-                    window.__toggleMobileNav(e);
-                  }
-                }
-              },{passive:false});
-            `,
+            __html: `if(typeof navigator!=="undefined"&&/Android/i.test(navigator.userAgent)){document.documentElement.classList.add("is-android");}`,
           }}
         />
       </head>

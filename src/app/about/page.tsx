@@ -75,24 +75,25 @@ interface MissionVisionCardProps {
 const MissionVisionCard = ({ icon, title, description, delay = 0 }: MissionVisionCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = React.useState(false);
-  const [rotation, setRotation] = React.useState({ x: 0, y: 0 });
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [3, -3]), { stiffness: 300, damping: 25 });
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-3, 3]), { stiffness: 300, damping: 25 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (cardRef.current) {
       const rect = cardRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
-
-      const rotateX = -(y / rect.height) * 3;
-      const rotateY = (x / rect.width) * 3;
-
-      setRotation({ x: rotateX, y: rotateY });
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      mouseX.set(x);
+      mouseY.set(y);
     }
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    setRotation({ x: 0, y: 0 });
+    mouseX.set(0);
+    mouseY.set(0);
   };
 
   return (
@@ -114,14 +115,9 @@ const MissionVisionCard = ({ icon, title, description, delay = 0 }: MissionVisio
         }}
       >
         <motion.div
-          animate={{
-            rotateX: rotation.x,
-            rotateY: rotation.y,
-          }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 20,
+          style={{
+            rotateX,
+            rotateY,
           }}
         >
           {/* Edge Glow Spotlight inside Card */}
@@ -196,24 +192,27 @@ const StickyPanel = ({ children, zIndex, noFadeOut = false }: StickyPanelProps) 
     offset: ["start start", "end start"]
   });
 
-  // Smoothly transform scale, blur, and brightness during overlap transition (delayed start for readability)
+  // Smoothly transform scale and dim overlay during overlap transition using 100% GPU compositor properties
   const scale = useTransform(scrollYProgress, [0, 0.75, 0.98], noFadeOut ? [1, 1, 1] : [1, 1, 0.98]);
-  const brightness = useTransform(scrollYProgress, [0, 0.75, 0.98], noFadeOut ? [1, 1, 1] : [1, 1, 0.5]);
-  const blurVal = useTransform(scrollYProgress, [0, 0.75, 0.98], noFadeOut ? [0, 0, 0] : [0, 0, 4]);
-
-  const filter = useMotionTemplate`brightness(${brightness}) blur(${blurVal}px)`;
+  const dimOpacity = useTransform(scrollYProgress, [0, 0.75, 0.98], noFadeOut ? [0, 0, 0] : [0, 0, 0.55]);
 
   return (
     <motion.div
       ref={panelRef}
       style={{
         scale,
-        filter,
         opacity: 1, // Force solid opacity to behave like sheets of paper
         zIndex: zIndex,
+        willChange: "transform",
       }}
       className={`sticky top-[8vh] sm:top-[10vh] w-full rounded-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.95)] border-t border-white/[0.08] border-x border-white/[0.03] border-b border-white/[0.03] bg-[#07070a] overflow-hidden ${zIndexMap[zIndex] || "z-10"}`}
     >
+      {!noFadeOut && (
+        <motion.div
+          style={{ opacity: dimOpacity }}
+          className="absolute inset-0 bg-black pointer-events-none z-50 transition-opacity"
+        />
+      )}
       {children}
     </motion.div>
   );
@@ -230,18 +229,6 @@ const STORIES = [
   { label: "08 SHINY GLASSMORPHISM", text: "Casting internal spotlight reflections across glass panels with clean border tracer shadows." },
   { label: "09 MAGNETIC TRANSLATIONS", text: "Calculating magnetic attraction vectors to pull UI elements to the user's cursor dynamically." }
 ];
-
-interface Star {
-  id: number;
-  width: number;
-  height: number;
-  top: string;
-  left: string;
-  driftX: number;
-  driftY: number;
-  duration: number;
-  delay: number;
-}
 
 export default function AboutPage() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -283,57 +270,22 @@ export default function AboutPage() {
     },
   };
 
-  // Mouse coordinates spotlight tracking (follows cursor inside Hero)
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const springConfig = { stiffness: 60, damping: 25 };
-  const smoothX = useSpring(mouseX, springConfig);
-  const smoothY = useSpring(mouseY, springConfig);
-
   const [isScrollerPaused, setIsScrollerPaused] = useState(false);
   const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
-  const [stars, setStars] = useState<Star[]>([]);
-
-  useEffect(() => {
-    // Generate 60 unique stars once on client-side mount for drifting and twinkling
-    const generatedStars = [...Array(60)].map((_, i) => ({
-      id: i,
-      width: Math.random() * 2 + 0.6,
-      height: Math.random() * 2 + 0.6,
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      driftX: (Math.random() - 0.5) * 45,
-      driftY: (Math.random() - 0.5) * 45,
-      duration: 12 + Math.random() * 18,
-      delay: Math.random() * 5,
-    }));
-    setStars(generatedStars);
-  }, []);
-
-  // Parallax spring calculations for background image
-  const bgXOffset = useTransform(smoothX, [0, 1920], [-12, 12]);
-  const bgYOffset = useTransform(smoothY, [0, 1080], [-12, 12]);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    mouseX.set(e.clientX - rect.left);
-    mouseY.set(e.clientY - rect.top);
-  };
 
   return (
     <div
       ref={containerRef}
-      onMouseMove={handleMouseMove}
       className="relative w-full bg-[#050505] text-white overflow-hidden z-10 pb-20 select-none"
     >
 
-      {/* ── 1. GLOBAL IMMERSIVE ATMOSPHERIC NEBULAS (Breathe & pulse) ── */}
+      {/* ── 1. GLOBAL IMMERSIVE ATMOSPHERIC NEBULAS (Hardware-accelerated) ── */}
       <motion.div
         className="absolute top-[30%] left-[10%] w-[700px] h-[550px] rounded-full pointer-events-none -z-20"
         style={{
           background: "radial-gradient(ellipse at center, rgba(147, 51, 234, 0.05) 0%, rgba(236, 72, 153, 0.01) 50%, transparent 80%)",
           filter: "blur(90px)",
+          willChange: "transform, opacity",
         }}
         animate={{
           scale: [1, 1.1, 1],
@@ -351,6 +303,7 @@ export default function AboutPage() {
         style={{
           background: "radial-gradient(ellipse at center, rgba(236, 72, 153, 0.03) 0%, rgba(147, 51, 234, 0.01) 50%, transparent 80%)",
           filter: "blur(100px)",
+          willChange: "transform, opacity",
         }}
         animate={{
           scale: [1.08, 0.96, 1.08],

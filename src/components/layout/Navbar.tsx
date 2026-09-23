@@ -21,28 +21,11 @@ const NAV_LINKS = [
 
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(() => {
-    if (typeof window !== "undefined" && (window as any).__isNavOpen) {
-      return true;
-    }
-    return false;
-  });
+  const [isOpen, setIsOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("Home");
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const isScrolled = useScroll(20);
   const pathname = usePathname();
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      (window as any).__reactNavHydrated = true;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      (window as any).__isNavOpen = isOpen;
-    }
-  }, [isOpen]);
 
   useEffect(() => {
     setIsOpen(false);
@@ -97,11 +80,11 @@ export function Navbar() {
   const width = useTransform(progress, [0, 1], ["95%", "80%"]);
   const py = useTransform(progress, [0, 1], ["14px", "8px"]);
   const px = useTransform(progress, [0, 1], ["24px", "14px"]);
-  
+
   // Backdrop blur amount mapping
   const blurVal = useTransform(progress, [0, 1], [14, 22]);
   const backdropFilter = useMotionTemplate`blur(${blurVal}px)`;
-  
+
   // Border gradient alpha mapping
   const borderAlpha = useTransform(progress, [0, 1], [0.10, 0.18]);
   const border = useMotionTemplate`1px solid rgba(180,120,255,${borderAlpha})`;
@@ -223,12 +206,12 @@ export function Navbar() {
 
   const navStyle = isMobile
     ? {
-        width: "95%",
-        paddingTop: "10px",
-        paddingBottom: "10px",
-        paddingLeft: "16px",
-        paddingRight: "16px",
-        background: `linear-gradient(
+      width: "95%",
+      paddingTop: "10px",
+      paddingBottom: "10px",
+      paddingLeft: "16px",
+      paddingRight: "16px",
+      background: `linear-gradient(
           90deg,
           rgba(8,8,10,0.92) 0%,
           rgba(30,30,35,0.82) 35%,
@@ -236,18 +219,18 @@ export function Navbar() {
           rgba(30,30,35,0.82) 65%,
           rgba(8,8,10,0.92) 100%
         )`,
-        border: "1px solid rgba(180,120,255,0.12)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        boxShadow: "0 16px 40px -15px rgba(139,92,246,0.15), 0 20px 50px rgba(0,0,0,0.7)",
-      }
+      border: "1px solid rgba(180,120,255,0.12)",
+      backdropFilter: "blur(16px)",
+      WebkitBackdropFilter: "blur(16px)",
+      boxShadow: "0 16px 40px -15px rgba(139,92,246,0.15), 0 20px 50px rgba(0,0,0,0.7)",
+    }
     : {
-        width,
-        paddingTop: py,
-        paddingBottom: py,
-        paddingLeft: px,
-        paddingRight: px,
-        background: `linear-gradient(
+      width,
+      paddingTop: py,
+      paddingBottom: py,
+      paddingLeft: px,
+      paddingRight: px,
+      background: `linear-gradient(
           90deg,
           rgba(8,8,10,0.92) 0%,
           rgba(30,30,35,0.82) 35%,
@@ -255,11 +238,11 @@ export function Navbar() {
           rgba(30,30,35,0.82) 65%,
           rgba(8,8,10,0.92) 100%
         )`,
-        border,
-        backdropFilter,
-        WebkitBackdropFilter: backdropFilter,
-        boxShadow,
-      };
+      border,
+      backdropFilter,
+      WebkitBackdropFilter: backdropFilter,
+      boxShadow,
+    };
 
   if (pathname === "/chat") return null;
 
@@ -334,14 +317,14 @@ export function Navbar() {
           </motion.div>
 
           {/* Center: Interactive Desktop Links */}
-          <motion.div 
+          <motion.div
             className="hidden lg:flex items-center relative"
             style={{ gap: linksGap }}
           >
             {NAV_LINKS.map((link) => {
               const isActive = activeLink === link.label;
               const isHovered = hoveredLink === link.label;
-              
+
               return (
                 <Link
                   key={link.label}
@@ -379,7 +362,7 @@ export function Navbar() {
           </motion.div>
 
           {/* Right: Glow CTA button */}
-          <motion.div 
+          <motion.div
             style={{ scale: ctaScale, originX: 1 }}
             className="hidden md:flex items-center justify-end w-[140px] md:w-[160px]"
           >
@@ -389,7 +372,7 @@ export function Navbar() {
             >
               {/* Shiny Glass Reflection (Top Highlight) */}
               <span className="absolute inset-0 z-0 bg-gradient-to-b from-white/12 via-white/5 to-transparent pointer-events-none" />
-              
+
               {/* Glow backdrop drop-shadow */}
               <span className="absolute inset-0 bg-brand-purple/15 rounded-full blur-md opacity-40 group-hover:opacity-75 transition-all duration-500 -z-10" />
 
@@ -405,7 +388,6 @@ export function Navbar() {
 
           {/* Mobile Drawer Trigger Menu Button with 0ms Touch Response */}
           <button
-            id="mobile-nav-toggle-btn"
             type="button"
             onPointerDown={toggleMenu}
             onClick={toggleMenu}
@@ -484,8 +466,8 @@ export function Navbar() {
                         }}
                         className={cn(
                           "group flex items-center justify-between text-2xl font-medium tracking-wide py-1 transition-all",
-                          isActive 
-                            ? "text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-brand-pink font-semibold" 
+                          isActive
+                            ? "text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-brand-pink font-semibold"
                             : "text-text-secondary hover:text-white"
                         )}
                       >
@@ -520,7 +502,7 @@ export function Navbar() {
                   info@manziostudio.com
                 </a>
               </div>
-              
+
               <Link
                 href="/contact"
                 onClick={() => setIsOpen(false)}
