@@ -337,8 +337,8 @@ export default function AboutPage() {
               textShadow: "0 0 30px rgba(255, 255, 255, 0.22), 0 0 60px rgba(139, 92, 246, 0.12)",
             }}
           >
-            <span className="block text-white/90 font-bold tracking-[-0.03em] mb-2 text-[0.95em] sm:text-[1.05em]">Digital Experiences</span>
-            <span className="block text-white font-bold tracking-[-0.04em] pb-1 text-[1.4em] sm:text-[1.7em] leading-tight sm:whitespace-nowrap">Engineered With Obsession</span>
+            <span className="block text-white/90 font-bold tracking-[-0.03em] mb-2 text-[1.08em] sm:text-[1.05em]">Digital Experiences</span>
+            <span className="block text-white font-bold tracking-[-0.04em] pb-1 text-[1.58em] sm:text-[1.7em] leading-tight sm:whitespace-nowrap">Engineered With Obsession</span>
           </motion.h1>
 
           <motion.p
