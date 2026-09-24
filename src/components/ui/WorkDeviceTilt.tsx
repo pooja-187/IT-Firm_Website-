@@ -29,10 +29,33 @@ export function WorkDeviceTilt({ titleComponent }: WorkDeviceTiltProps) {
       setIsMobile(window.innerWidth <= 768);
     };
     checkMobile();
-    window.addEventListener("resize", checkMobile);
+    window.addEventListener("resize", checkMobile, { passive: true });
     return () => {
       window.removeEventListener("resize", checkMobile);
     };
+  }, []);
+
+  // Ensure video playback is reliable and does not stall during scroll/GPU load
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.play().catch(() => {});
+
+    if (typeof IntersectionObserver !== "undefined") {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(video);
+      return () => observer.disconnect();
+    }
   }, []);
 
   const { scrollYProgress } = useScroll({
@@ -82,21 +105,14 @@ export function WorkDeviceTilt({ titleComponent }: WorkDeviceTiltProps) {
         <DeviceCard rotate={rotate} translate={translate} scale={scale}>
           <video
             ref={videoRef}
-            key="/videos/work_video_dynamic.mp4"
             src="/videos/work_video_dynamic.mp4"
-            className="w-full h-full object-cover rounded-2xl"
+            className="w-full h-full object-cover rounded-2xl block"
             autoPlay
             loop
             muted
             playsInline
             preload="auto"
-            style={{
-              transform: "translateZ(0)",
-              backfaceVisibility: "hidden",
-            }}
-          >
-            <source src="/videos/work_video_dynamic.mp4" type="video/mp4" />
-          </video>
+          />
         </DeviceCard>
       </div>
     </div>
@@ -118,23 +134,19 @@ function DeviceCard({
       style={{
         rotateX: rotate,
         scale,
-        transformStyle: "preserve-3d",
-        backfaceVisibility: "hidden",
         willChange: "transform",
-        isolation: "isolate",
         boxShadow:
           "0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 3px rgba(38, 38, 38, 1), 0 0 0 5px rgba(64, 64, 64, 1), 0 20px 40px rgba(0, 0, 0, 0.7), 0 45px 80px rgba(0, 0, 0, 0.6)",
       }}
       className="max-w-3xl lg:max-w-4xl -mt-2 sm:-mt-6 md:-mt-10 mx-auto h-[14rem] sm:h-[22rem] md:h-[28rem] lg:h-[32rem] w-full relative bg-neutral-950 p-[12px] md:p-[14px] lg:p-[16px] rounded-[24px] md:rounded-[36px] shadow-2xl overflow-visible"
     >
+      {/* Front Camera Sensor Dot */}
       <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0d0d0d] ring-1 ring-zinc-800/40 z-30 flex items-center justify-center opacity-80">
         <div className="w-[2px] h-[2px] rounded-full bg-blue-900/60" />
       </div>
 
-      <div
-        style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
-        className="relative h-full w-full overflow-hidden rounded-[20px] md:rounded-[24px] bg-zinc-950 border border-white/[0.05]"
-      >
+      {/* Screen container frame */}
+      <div className="relative h-full w-full overflow-hidden rounded-[20px] md:rounded-[24px] bg-zinc-950 border border-white/[0.05]">
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.07] z-20" />
         {children}
       </div>

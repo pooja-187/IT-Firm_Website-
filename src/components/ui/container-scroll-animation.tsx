@@ -82,10 +82,7 @@ export const Card = ({
       style={{
         rotateX: rotate,
         scale,
-        transformStyle: "preserve-3d",
-        backfaceVisibility: "hidden",
         willChange: "transform",
-        isolation: "isolate",
         // Apple iPad Pro photorealistic multi-level chassis bevels & drop shadows
         boxShadow:
           "0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 3px rgba(38, 38, 38, 1), 0 0 0 5px rgba(64, 64, 64, 1), 0 20px 40px rgba(0, 0, 0, 0.7), 0 45px 80px rgba(0, 0, 0, 0.6)",
@@ -99,10 +96,7 @@ export const Card = ({
       </div>
 
       {/* Screen container frame with nested aspect curves */}
-      <div
-        style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
-        className="relative h-full w-full overflow-hidden rounded-[20px] md:rounded-[24px] bg-zinc-950 border border-white/[0.05]"
-      >
+      <div className="relative h-full w-full overflow-hidden rounded-[20px] md:rounded-[24px] bg-zinc-950 border border-white/[0.05]">
         {/* Subtle glass glossy reflections sweep overlay - pure alpha to prevent GPU mix-blend stall */}
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.07] z-20" />
         {children}

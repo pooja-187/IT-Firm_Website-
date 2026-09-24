@@ -312,10 +312,8 @@ export default function WorkPage() {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!pageContainerRef.current) return;
-    const rect = pageContainerRef.current.getBoundingClientRect();
-    mouseX.set(e.clientX - rect.left);
-    mouseY.set(e.clientY - rect.top);
+    mouseX.set(e.clientX);
+    mouseY.set(e.clientY);
   };
 
   const bgSpotlight = useMotionTemplate`radial-gradient(450px circle at ${smoothX}px ${smoothY}px, rgba(147, 51, 234, 0.12) 0%, rgba(236, 72, 153, 0.02) 45%, transparent 100%)`;
@@ -468,6 +466,7 @@ export default function WorkPage() {
           style={{
             background: "radial-gradient(ellipse at center, rgba(147, 51, 234, 0.08) 0%, rgba(236, 72, 153, 0.01) 50%, transparent 80%)",
             filter: "blur(120px)",
+            willChange: "transform, opacity",
           }}
           animate={{
             scale: [1, 1.12, 1],
@@ -485,6 +484,7 @@ export default function WorkPage() {
           style={{
             background: "radial-gradient(ellipse at center, rgba(168, 85, 247, 0.06) 0%, rgba(236, 72, 153, 0.015) 50%, transparent 80%)",
             filter: "blur(140px)",
+            willChange: "transform, opacity",
           }}
           animate={{
             scale: [1.08, 0.96, 1.08],
